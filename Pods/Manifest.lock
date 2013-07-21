@@ -1,0 +1,25 @@
+PODS:
+  - AFNetworking (1.1.0)
+  - Backbeam (0.10.2):
+    - AFNetworking (~> 1.1.0)
+    - JSONKit (~> 1.4.0)
+    - socket.IO (~> 0.2.5)
+  - JSONKit (1.4)
+  - socket.IO (0.2.5):
+    - SocketRocket (~> 0.2)
+  - SocketRocket (0.3.1-beta2)
+  - SVProgressHUD (0.9)
+
+DEPENDENCIES:
+  - Backbeam
+  - SVProgressHUD
+
+SPEC CHECKSUMS:
+  AFNetworking: 761a418233d280c1e0580bcb76ff9cb4c3073d17
+  Backbeam: e1b3ddda8beab633631460cf3dedb425ecae8bee
+  JSONKit: 0e3367114e2799047082628156e09893d8268f91
+  socket.IO: b24b39d603516f2b0a4107568eaef6f7e57e91d9
+  SocketRocket: 7ac946bcce46287a791dfff3c1f8daa692821dae
+  SVProgressHUD: 03d4845ec8e64591726428a08236c6a5489d45f8
+
+COCOAPODS: 0.20.2
