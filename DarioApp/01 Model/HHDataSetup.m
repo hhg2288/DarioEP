@@ -7,34 +7,46 @@
 //
 
 #import "HHDataSetup.h"
+#import <Backbeam/Backbeam.h>
 
 @implementation HHDataSetup
 
-- (void)fetchData
+- (id)initWithDataFromService
+{
+    self = [super init];
+    if (self) {
+        BBQuery* query = [Backbeam queryForEntity:@"client"];
+        [query setQuery:@"join avatar"];
+        // optional: you can set a fetch policy
+        [query setFetchPolicy:BBFetchPolicyLocalAndRemote];
+        [query fetch:100 offset:0 success:^(NSArray* clients, NSInteger totalCount, BOOL fromCache) {
+            NSLog(@"%@", clients);
+            
+            _theData = [NSMutableArray arrayWithArray:clients];
+            
+        } failure:^(NSError* error) {
+            // something went wrong
+        }];
+    }
+    return self;
+}
+
+- (void)save
 {
     
 }
 
-- (void)saveData
-{
-    
-}
-
-- (void)updateData
+- (void)update
 {
     
 }
 
 - (BOOL)isEmpty
 {
-    BOOL var = YES;
-    return var;
-}
-
-- (NSDate *)lastTimePushed
-{
-    NSDate *date = [NSDate date];
-    return date;
+    if (_theData) {
+        return NO;
+    }
+    return YES;
 }
 
 

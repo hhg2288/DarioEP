@@ -9,6 +9,7 @@
 #import "HHMasterViewController.h"
 #import "HHDetailViewController.h"
 #import "HHClientCell.h"
+#import "HHDataSetup.h"
 
 
 @interface UITableView (reloadCategory)
@@ -31,6 +32,7 @@
 }
 
 @end
+
 
 @interface HHMasterViewController () {
     NSMutableArray *theClients;
@@ -55,32 +57,15 @@
 
     self.detailViewController = (HHDetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
     
-    [self fetchData];
+    HHDataSetup *data = [[HHDataSetup alloc] initWithDataFromService];
+    theClients = [data theData];
     
     [self setupRefreshControl];
 }
 
-- (void)fetchData
-{
-    BBQuery* query = [Backbeam queryForEntity:@"client"];
-    [query setQuery:@"join avatar"];
-    // optional: you can set a fetch policy
-    //[query setFetchPolicy:BBFetchPolicyLocalAndRemote];
-    [query fetch:100 offset:0 success:^(NSArray* clients, NSInteger totalCount, BOOL fromCache) {
-        
-        // do something with these objects
-        theClients = [NSMutableArray arrayWithArray:clients];
-        [self.tableView reloadData];
-        //NSLog(@"%@", clients);
-        
-    } failure:^(NSError* error) {
-        // something went wrong
-    }];
-}
-
 - (void)updateClients
 {
-    [self fetchData];
+    //[self fetchData];
     
     [self.refreshControl endRefreshing];
 }
