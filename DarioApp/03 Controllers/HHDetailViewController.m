@@ -7,6 +7,7 @@
 //
 
 #import "HHDetailViewController.h"
+#import "HHSessionViewController.h"
 #import <Backbeam/Backbeam.h>
 
 @interface HHDetailViewController ()
@@ -47,7 +48,7 @@
         self.clientEmail.text = [_client stringForField:@"email"];
         self.clientPendingSessions.text = [NSString stringWithFormat:@"%@", [_client numberForField:@"pendingsessions"]];
     } else {
-        NSLog(@"no hay objeto!");
+        //NSLog(@"no hay objeto!");
         [self disableClientActions];
     }
 }
@@ -95,6 +96,18 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+#pragma mark - HHSessionClientVC Delegate Methods
+
+- (void)sessionClientViewControllerDidSave:(HHSessionViewController *)controller
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)sessionClientViewControllerDidCancel:(HHSessionViewController *)controller
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 #pragma mark - PrepareForSeque
 
 - (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
@@ -109,6 +122,10 @@
         //set de data Client
         cdvc.clientInEdition = _client;
         
+    } else if ([segue.identifier isEqualToString:@"SessionClient"])
+    {
+        HHSessionViewController *modalcontroller = segue.destinationViewController;
+        modalcontroller.delegate = self;
     }
     
 }

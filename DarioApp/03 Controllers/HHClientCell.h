@@ -11,5 +11,6 @@
 @interface HHClientCell : UITableViewCell
 @property (weak, nonatomic) IBOutlet UILabel *firstName;
 @property (weak, nonatomic) IBOutlet UILabel *lastName;
+@property (weak, nonatomic) IBOutlet UIImageView *avatar;
 
 @end

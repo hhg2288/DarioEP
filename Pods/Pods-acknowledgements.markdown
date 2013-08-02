@@ -94,6 +94,15 @@ respective headers for the terms of their individual licenses.
 
 
 
+## TestFlightSDK
+
+All text and design is copyright © 2010-2013 TestFlight App, Inc.
+
+All rights reserved.
+
+https://testflightapp.com/tos/
+
+
 ## socket.IO
 
 Copyright (c) 2011-12 Philipp Kyeck <http://beta-interactive.de>

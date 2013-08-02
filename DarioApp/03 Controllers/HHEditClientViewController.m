@@ -34,7 +34,7 @@
 {
     if (!_clientInEdition)
     {
-        NSLog(@"crear el objeto porque no existe");
+        //NSLog(@"crear el objeto porque no existe");
         _clientInEdition = [Backbeam emptyObjectForEntity:@"client"];
     }
     else {
@@ -68,7 +68,7 @@
           
       } failure:^(BBObject* obj, NSError* error) {
           // Something went wrong
-          NSLog(@"got error: %@", error);
+          //NSLog(@"got error: %@", error);
       }];
 }
 

@@ -9,8 +9,9 @@
 #import <UIKit/UIKit.h>
 #import <Backbeam/Backbeam.h>
 #import "HHEditClientViewController.h"
+#import "HHSessionViewController.h"
 
-@interface HHDetailViewController : UIViewController <UISplitViewControllerDelegate, HHEditClientViewControllerDelegate>
+@interface HHDetailViewController : UIViewController <UISplitViewControllerDelegate, HHEditClientViewControllerDelegate, HHSessionViewControllerDelegate>
 
 @property (strong, nonatomic) BBObject *client;
 

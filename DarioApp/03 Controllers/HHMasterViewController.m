@@ -10,9 +10,32 @@
 #import "HHDetailViewController.h"
 #import "HHClientCell.h"
 
+
+@interface UITableView (reloadCategory)
+
+- (void)reloadRowAtIndexPath:(NSIndexPath *)indexPath withRowAnimation:(UITableViewRowAnimation)animation;
+
+@end
+
+@implementation UITableView (reloadCategory)
+
+- (void)reloadRowAtIndexPath:(NSIndexPath *)indexPath withRowAnimation:(UITableViewRowAnimation)animation
+{
+    if ([self.dataSource numberOfSectionsInTableView:self] <= indexPath.section) {
+        return;
+    }
+    if ([self.dataSource tableView:self numberOfRowsInSection:indexPath.section] <= indexPath.row) {
+        return;
+    }
+    [self reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:animation];
+}
+
+@end
+
 @interface HHMasterViewController () {
     NSMutableArray *theClients;
 }
+
 @end
 
 @implementation HHMasterViewController
@@ -28,13 +51,21 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    self.navigationItem.leftBarButtonItem = self.editButtonItem;
+    //self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
     self.detailViewController = (HHDetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
     
+    [self fetchData];
+    
+    [self setupRefreshControl];
+}
+
+- (void)fetchData
+{
     BBQuery* query = [Backbeam queryForEntity:@"client"];
+    [query setQuery:@"join avatar"];
     // optional: you can set a fetch policy
-    [query setFetchPolicy:BBFetchPolicyLocalAndRemote];
+    //[query setFetchPolicy:BBFetchPolicyLocalAndRemote];
     [query fetch:100 offset:0 success:^(NSArray* clients, NSInteger totalCount, BOOL fromCache) {
         
         // do something with these objects
@@ -45,8 +76,21 @@
     } failure:^(NSError* error) {
         // something went wrong
     }];
+}
+
+- (void)updateClients
+{
+    [self fetchData];
     
-    
+    [self.refreshControl endRefreshing];
+}
+
+- (void)setupRefreshControl
+{
+    UIRefreshControl *refreshControl = [[UIRefreshControl alloc]
+                                        init];
+    [refreshControl addTarget:self action:@selector(updateClients) forControlEvents:UIControlEventValueChanged];
+    self.refreshControl = refreshControl;
 }
 
 - (void)didReceiveMemoryWarning
@@ -85,6 +129,7 @@
     BBObject *client = [theClients objectAtIndex:indexPath.row];
     cell.firstName.text = [client stringForField:@"firstname"];
     cell.lastName.text = [client stringForField:@"lastname"];
+    
     return cell;
 }
 
@@ -120,6 +165,15 @@
     self.detailViewController.client = clientSelected;
 }
 
+- (BOOL)isClientLoad
+{
+    if (theClients)
+    {
+        return YES;
+    }
+    return NO;
+}
+
 
 #pragma mark - HHEditClientVC Delegate Methods
 
@@ -139,15 +193,13 @@
 
 - (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    
-    if ([segue.identifier isEqualToString:@"NewClient"])
+    if ([segue.identifier isEqualToString:@"ModalNewClient"])
     {
         //set  it as delegate to close it later
         HHEditClientViewController *cdvc = segue.destinationViewController;
         cdvc.delegate = self;
         
     }
-    
 }
 
 

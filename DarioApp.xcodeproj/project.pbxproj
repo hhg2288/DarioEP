@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		243053E817A0936E00848E3A /* HHSignerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 243053E717A0936E00848E3A /* HHSignerViewController.m */; };
 		24974ABE178605DB000AD52F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24974ABD178605DB000AD52F /* UIKit.framework */; };
 		24974AC0178605DB000AD52F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24974ABF178605DB000AD52F /* Foundation.framework */; };
 		24974AC2178605DB000AD52F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24974AC1178605DB000AD52F /* CoreGraphics.framework */; };
@@ -20,11 +21,18 @@
 		24974ADA178605DC000AD52F /* HHMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24974AD9178605DC000AD52F /* HHMasterViewController.m */; };
 		24974ADD178605DC000AD52F /* HHDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24974ADC178605DC000AD52F /* HHDetailViewController.m */; };
 		24C2BDF1179AF10100EB5B03 /* HHEditClientViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24C2BDF0179AF10100EB5B03 /* HHEditClientViewController.m */; };
+		24E07B8F17A3E2A60027D01F /* HHClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 24E07B8E17A3E2A60027D01F /* HHClient.m */; };
+		24E07B9117A3E2DC0027D01F /* data.plist in Resources */ = {isa = PBXBuildFile; fileRef = 24E07B9017A3E2DC0027D01F /* data.plist */; };
+		24E07B9417A3E6F60027D01F /* HHDataSetup.m in Sources */ = {isa = PBXBuildFile; fileRef = 24E07B9317A3E6F60027D01F /* HHDataSetup.m */; };
+		24E07B9717A3E8600027D01F /* HHSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 24E07B9617A3E8600027D01F /* HHSession.m */; };
 		24ECE4E11799EBBF00CFB726 /* HHClientCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 24ECE4E01799EBBF00CFB726 /* HHClientCell.m */; };
+		24F9D3DB179EBA7800941CA5 /* HHSessionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24F9D3DA179EBA7800941CA5 /* HHSessionViewController.m */; };
 		4F45F39ABB7546B58BED1A14 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8198C798C4D84373968F03CC /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		243053E617A0936E00848E3A /* HHSignerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHSignerViewController.h; sourceTree = "<group>"; };
+		243053E717A0936E00848E3A /* HHSignerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHSignerViewController.m; sourceTree = "<group>"; };
 		24974ABA178605DB000AD52F /* DarioApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DarioApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		24974ABD178605DB000AD52F /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		24974ABF178605DB000AD52F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -45,8 +53,17 @@
 		24974ADC178605DC000AD52F /* HHDetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HHDetailViewController.m; sourceTree = "<group>"; };
 		24C2BDEF179AF10100EB5B03 /* HHEditClientViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHEditClientViewController.h; sourceTree = "<group>"; };
 		24C2BDF0179AF10100EB5B03 /* HHEditClientViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHEditClientViewController.m; sourceTree = "<group>"; };
+		24E07B8D17A3E2A60027D01F /* HHClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHClient.h; sourceTree = "<group>"; };
+		24E07B8E17A3E2A60027D01F /* HHClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHClient.m; sourceTree = "<group>"; };
+		24E07B9017A3E2DC0027D01F /* data.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = data.plist; sourceTree = "<group>"; };
+		24E07B9217A3E6F60027D01F /* HHDataSetup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHDataSetup.h; sourceTree = "<group>"; };
+		24E07B9317A3E6F60027D01F /* HHDataSetup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHDataSetup.m; sourceTree = "<group>"; };
+		24E07B9517A3E8600027D01F /* HHSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHSession.h; sourceTree = "<group>"; };
+		24E07B9617A3E8600027D01F /* HHSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHSession.m; sourceTree = "<group>"; };
 		24ECE4DF1799EBBF00CFB726 /* HHClientCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHClientCell.h; sourceTree = "<group>"; };
 		24ECE4E01799EBBF00CFB726 /* HHClientCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHClientCell.m; sourceTree = "<group>"; };
+		24F9D3D9179EBA7800941CA5 /* HHSessionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHSessionViewController.h; sourceTree = "<group>"; };
+		24F9D3DA179EBA7800941CA5 /* HHSessionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHSessionViewController.m; sourceTree = "<group>"; };
 		608FDA0CFD7946A690ADAB3F /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		8198C798C4D84373968F03CC /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -111,6 +128,7 @@
 		24974AC4178605DB000AD52F /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				24E07B9017A3E2DC0027D01F /* data.plist */,
 				24974AC5178605DB000AD52F /* DarioApp-Info.plist */,
 				24974AC6178605DB000AD52F /* InfoPlist.strings */,
 				24974AC9178605DB000AD52F /* main.m */,
@@ -125,8 +143,15 @@
 		24ECE4DC1799E30700CFB726 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				24E07B8D17A3E2A60027D01F /* HHClient.h */,
+				24E07B8E17A3E2A60027D01F /* HHClient.m */,
+				24E07B9217A3E6F60027D01F /* HHDataSetup.h */,
+				24E07B9317A3E6F60027D01F /* HHDataSetup.m */,
+				24E07B9517A3E8600027D01F /* HHSession.h */,
+				24E07B9617A3E8600027D01F /* HHSession.m */,
 			);
 			name = Model;
+			path = "01 Model";
 			sourceTree = "<group>";
 		};
 		24ECE4DD1799E30E00CFB726 /* Views */ = {
@@ -140,6 +165,8 @@
 		24ECE4DE1799E31400CFB726 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				243053E617A0936E00848E3A /* HHSignerViewController.h */,
+				243053E717A0936E00848E3A /* HHSignerViewController.m */,
 				24974AD8178605DC000AD52F /* HHMasterViewController.h */,
 				24974AD9178605DC000AD52F /* HHMasterViewController.m */,
 				24974ADB178605DC000AD52F /* HHDetailViewController.h */,
@@ -148,8 +175,11 @@
 				24ECE4E01799EBBF00CFB726 /* HHClientCell.m */,
 				24C2BDEF179AF10100EB5B03 /* HHEditClientViewController.h */,
 				24C2BDF0179AF10100EB5B03 /* HHEditClientViewController.m */,
+				24F9D3D9179EBA7800941CA5 /* HHSessionViewController.h */,
+				24F9D3DA179EBA7800941CA5 /* HHSessionViewController.m */,
 			);
 			name = Controllers;
+			path = "03 Controllers";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -211,6 +241,7 @@
 				24974AD2178605DC000AD52F /* Default@2x.png in Resources */,
 				24974AD4178605DC000AD52F /* Default-568h@2x.png in Resources */,
 				24974AD7178605DC000AD52F /* MainStoryboard.storyboard in Resources */,
+				24E07B9117A3E2DC0027D01F /* data.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,6 +289,11 @@
 				24974ADD178605DC000AD52F /* HHDetailViewController.m in Sources */,
 				24ECE4E11799EBBF00CFB726 /* HHClientCell.m in Sources */,
 				24C2BDF1179AF10100EB5B03 /* HHEditClientViewController.m in Sources */,
+				24F9D3DB179EBA7800941CA5 /* HHSessionViewController.m in Sources */,
+				243053E817A0936E00848E3A /* HHSignerViewController.m in Sources */,
+				24E07B8F17A3E2A60027D01F /* HHClient.m in Sources */,
+				24E07B9417A3E6F60027D01F /* HHDataSetup.m in Sources */,
+				24E07B9717A3E8600027D01F /* HHSession.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
