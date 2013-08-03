@@ -26,7 +26,7 @@
 
 - (NSString *) description
 {
-    return [NSString stringWithFormat:@"Client FirstName: %@; /n LastName: %@", _firstName, _lastName];
+    return [NSString stringWithFormat:@"Client FirstName: %@; \n LastName: %@", _firstName, _lastName];
 }
 
 

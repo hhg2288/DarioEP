@@ -9,6 +9,7 @@
 #import "HHMasterViewController.h"
 #import "HHDetailViewController.h"
 #import "HHClientCell.h"
+#import "HHClient.h"
 #import "HHDataSetup.h"
 
 
@@ -65,8 +66,6 @@
 
 - (void)updateClients
 {
-    //[self fetchData];
-    
     [self.refreshControl endRefreshing];
 }
 
@@ -111,9 +110,9 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     HHClientCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-    BBObject *client = [theClients objectAtIndex:indexPath.row];
-    cell.firstName.text = [client stringForField:@"firstname"];
-    cell.lastName.text = [client stringForField:@"lastname"];
+    HHClient *client = [theClients objectAtIndex:indexPath.row];
+    cell.firstName.text = [client firstName];
+    cell.lastName.text = [client lastName];
     
     return cell;
 }

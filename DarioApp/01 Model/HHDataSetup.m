@@ -7,6 +7,7 @@
 //
 
 #import "HHDataSetup.h"
+#import "HHClient.h"
 #import <Backbeam/Backbeam.h>
 
 @implementation HHDataSetup
@@ -22,13 +23,29 @@
         [query fetch:100 offset:0 success:^(NSArray* clients, NSInteger totalCount, BOOL fromCache) {
             NSLog(@"%@", clients);
             
-            _theData = [NSMutableArray arrayWithArray:clients];
+            [self serializeDataFromArray:clients];
+            
             
         } failure:^(NSError* error) {
             // something went wrong
         }];
     }
     return self;
+}
+
+- (void)serializeDataFromArray:(NSArray *)arrayFromFetch
+{
+    NSMutableArray *arrayPreviousSorting = [[NSMutableArray alloc] init];
+    
+    for (id client in arrayFromFetch)
+    {
+        HHClient *tempClient = [[HHClient alloc] initWithFirstName:[client stringForField:@"firstname"] lastName:[client stringForField:@"lastname"] email:[client stringForField:@"email"] birthDate:nil paidSessions:[NSString stringWithFormat:@"%@", [client numberForField:@"pendingsessions"]] usedSessions:nil];
+        [arrayPreviousSorting addObject:tempClient];
+    }
+    
+    NSSortDescriptor *sorter = [[NSSortDescriptor alloc] initWithKey:@"firstName" ascending:YES selector:@selector(caseInsensitiveCompare:)];
+    NSArray *sortDescriptors = @[ sorter ];
+    _theData = [NSMutableArray arrayWithArray:[arrayPreviousSorting sortedArrayUsingDescriptors:sortDescriptors]];
 }
 
 - (void)save
@@ -47,6 +64,23 @@
         return NO;
     }
     return YES;
+}
+
+- (void)addClientToService:(HHClient *)client 
+{
+    // IMPLEMENT DELEGATE PROTOCOL TO SAVE DATA. PARA SUSTITUIR 'SELF' POR CONTROLLER
+    
+//    [client setString:self.inputFirstName.text forField:@"firstname"];
+//    [client setString:self.inputLastName.text forField:@"lastname"];
+//    [client setString:self.inputEmail.text forField:@"email"];
+//    [client setNumber:[NSNumber numberWithFloat:[self.inputPendingSessions.text floatValue]] forField:@"pendingsessions"];
+//    [client save:^(BBObject* obj) {
+//        
+//        
+//    } failure:^(BBObject* obj, NSError* error) {
+//        // Something went wrong
+//        //NSLog(@"got error: %@", error);
+//    }];
 }
 
 

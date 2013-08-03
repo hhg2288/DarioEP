@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "HHClient.h"
 
 @interface HHDataSetup : NSObject 
 
@@ -17,5 +18,6 @@
 - (void)save;
 - (void)update;
 - (BOOL)isEmpty;
+- (void)addClientToService:(HHClient *)client;
 
 @end
