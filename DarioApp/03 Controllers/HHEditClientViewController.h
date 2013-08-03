@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <Backbeam/Backbeam.h>
+#import "HHClient.h"
 
 @class HHEditClientViewController;
 
@@ -21,7 +21,7 @@
 @interface HHEditClientViewController : UIViewController
 
 @property (nonatomic, weak) id <HHEditClientViewControllerDelegate> delegate;
-@property (nonatomic, strong) BBObject *clientInEdition;
+@property (nonatomic, strong) HHClient *clientInEdition;
 
 @property (weak, nonatomic) IBOutlet UITextField *inputFirstName;
 @property (weak, nonatomic) IBOutlet UITextField *inputLastName;

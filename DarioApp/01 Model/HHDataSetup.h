@@ -7,15 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "HHClient.h"
 
-@interface HHDataSetup : NSObject {
-    NSMutableDictionary *theData;
-}
+@interface HHDataSetup : NSObject 
 
-- (void)fetchData;
-- (void)saveData;
-- (void)updateData;
+@property (nonatomic, strong) NSMutableArray *theData;
+@property (nonatomic, strong) NSDate *lastTimeSaved;
+
+- (id)initWithDataFromService;
+- (void)save;
+- (void)update;
 - (BOOL)isEmpty;
-- (NSDate *)lastTimePushed;
+- (void)addClientToService:(HHClient *)client;
 
 @end

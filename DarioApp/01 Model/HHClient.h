@@ -17,4 +17,7 @@
 @property (nonatomic, strong) NSNumber *paidSessions;
 @property (nonatomic, strong) NSDictionary *usedSessions;
 
+- (id)initWithFirstName:(NSString *)firstname lastName:(NSString *)lastname email: (NSString *)email birthDate:(NSDate *)birthdate paidSessions:(NSNumber *)paidsessions usedSessions:(NSDictionary *)usedSessions;
+- (NSString *)description;
+
 @end

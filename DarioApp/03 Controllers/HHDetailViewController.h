@@ -7,13 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <Backbeam/Backbeam.h>
 #import "HHEditClientViewController.h"
 #import "HHSessionViewController.h"
+#import "HHClient.h"
 
 @interface HHDetailViewController : UIViewController <UISplitViewControllerDelegate, HHEditClientViewControllerDelegate, HHSessionViewControllerDelegate>
 
-@property (strong, nonatomic) BBObject *client;
+@property (strong, nonatomic) HHClient *client;
 
 @property (weak, nonatomic) IBOutlet UILabel *clientFirstName;
 @property (weak, nonatomic) IBOutlet UILabel *clientLastName;

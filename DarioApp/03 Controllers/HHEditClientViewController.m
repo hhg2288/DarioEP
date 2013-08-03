@@ -35,14 +35,14 @@
     if (!_clientInEdition)
     {
         //NSLog(@"crear el objeto porque no existe");
-        _clientInEdition = [Backbeam emptyObjectForEntity:@"client"];
+        _clientInEdition = [[HHClient alloc] init];
     }
     else {
         //se rellenan los campos con los datos del user
-        self.inputFirstName.text = [_clientInEdition stringForField:@"firstname"];
-        self.inputLastName.text = [_clientInEdition stringForField:@"lastname"];
-        self.inputEmail.text = [_clientInEdition stringForField:@"email"];
-        self.inputPendingSessions.text = [NSString stringWithFormat:@"%@", [_clientInEdition numberForField:@"pendingsessions"]];
+        self.inputFirstName.text = [_clientInEdition firstName];
+        self.inputLastName.text = [_clientInEdition lastName];
+        self.inputEmail.text = [_clientInEdition email];
+        self.inputPendingSessions.text = [NSString stringWithFormat:@"%@", [_clientInEdition paidSessions]];
     }
 }
 
@@ -59,17 +59,7 @@
 
 - (void)saveClient
 {
-      [_clientInEdition setString:self.inputFirstName.text forField:@"firstname"];
-      [_clientInEdition setString:self.inputLastName.text forField:@"lastname"];
-      [_clientInEdition setString:self.inputEmail.text forField:@"email"];
-      [_clientInEdition setNumber:[NSNumber numberWithFloat:[self.inputPendingSessions.text floatValue]] forField:@"pendingsessions"];
-      [_clientInEdition save:^(BBObject* obj) {
-          
-          
-      } failure:^(BBObject* obj, NSError* error) {
-          // Something went wrong
-          //NSLog(@"got error: %@", error);
-      }];
+    //METODO DEL DELEGADO DEL MODELO PARA GUARDAR DATOS DE UN CLIENTE MAS
 }
 
 

@@ -23,7 +23,7 @@
 
 #pragma mark - Managing the detail item
 
-- (void)setClient:(BBObject *)newClient
+- (void)setClient:(HHClient *)newClient
 {
     if (_client != newClient) {
         _client = newClient;
@@ -43,10 +43,10 @@
     
     if (self.client) {
         [self enableClientActions];
-        self.clientFirstName.text = [_client stringForField:@"firstname"];
-        self.clientLastName.text = [_client stringForField:@"lastname"];
-        self.clientEmail.text = [_client stringForField:@"email"];
-        self.clientPendingSessions.text = [NSString stringWithFormat:@"%@", [_client numberForField:@"pendingsessions"]];
+        self.clientFirstName.text = [_client firstName];
+        self.clientLastName.text = [_client lastName];
+        self.clientEmail.text = [_client email];
+        self.clientPendingSessions.text = [NSString stringWithFormat:@"%@", [_client paidSessions]];
     } else {
         //NSLog(@"no hay objeto!");
         [self disableClientActions];
