@@ -48,6 +48,7 @@
 		4AB0D9051895649D003FE9EC /* _User.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D9011895649D003FE9EC /* _User.m */; };
 		4AB0D909189565E7003FE9EC /* RCMAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D908189565E7003FE9EC /* RCMAPIClient.m */; };
 		4AB0D90C18956797003FE9EC /* RCMManagedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D90B18956797003FE9EC /* RCMManagedObject.m */; };
+		4AB0D911189574BF003FE9EC /* UIViewController+APIClientAddition.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D910189574BF003FE9EC /* UIViewController+APIClientAddition.m */; };
 		4F45F39ABB7546B58BED1A14 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8198C798C4D84373968F03CC /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -99,6 +100,8 @@
 		4AB0D90A18956797003FE9EC /* RCMManagedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCMManagedObject.h; sourceTree = "<group>"; };
 		4AB0D90B18956797003FE9EC /* RCMManagedObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCMManagedObject.m; sourceTree = "<group>"; };
 		4AB0D90D1895685E003FE9EC /* RCMAPIResponseCoreDataMappingProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCMAPIResponseCoreDataMappingProtocol.h; sourceTree = "<group>"; };
+		4AB0D90F189574BF003FE9EC /* UIViewController+APIClientAddition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+APIClientAddition.h"; sourceTree = "<group>"; };
+		4AB0D910189574BF003FE9EC /* UIViewController+APIClientAddition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+APIClientAddition.m"; sourceTree = "<group>"; };
 		608FDA0CFD7946A690ADAB3F /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		8198C798C4D84373968F03CC /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -203,6 +206,7 @@
 		24ECE4DE1799E31400CFB726 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				4AB0D90E1895749D003FE9EC /* Utils */,
 				243053E617A0936E00848E3A /* HHSignerViewController.h */,
 				243053E717A0936E00848E3A /* HHSignerViewController.m */,
 				24974AD8178605DC000AD52F /* HHMasterViewController.h */,
@@ -269,6 +273,15 @@
 				4AB0D908189565E7003FE9EC /* RCMAPIClient.m */,
 			);
 			path = Networking;
+			sourceTree = "<group>";
+		};
+		4AB0D90E1895749D003FE9EC /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				4AB0D90F189574BF003FE9EC /* UIViewController+APIClientAddition.h */,
+				4AB0D910189574BF003FE9EC /* UIViewController+APIClientAddition.m */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -393,6 +406,7 @@
 				24974ADA178605DC000AD52F /* HHMasterViewController.m in Sources */,
 				4AB0D9021895649D003FE9EC /* Session.m in Sources */,
 				4AB0D9041895649D003FE9EC /* _Session.m in Sources */,
+				4AB0D911189574BF003FE9EC /* UIViewController+APIClientAddition.m in Sources */,
 				24974ADD178605DC000AD52F /* HHDetailViewController.m in Sources */,
 				4AB0D909189565E7003FE9EC /* RCMAPIClient.m in Sources */,
 				24ECE4E11799EBBF00CFB726 /* HHClientCell.m in Sources */,
