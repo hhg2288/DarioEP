@@ -27,11 +27,17 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    
 }
 
 - (IBAction)save:(id)sender
 {
+    //save data
+    /* date: */
+        NSDateFormatter *df = [[NSDateFormatter alloc] init];
+        [df setDateFormat:@"M/d/yyyy"];
+        //text = [df stringFromDate:[_datePicker date]];
+    //NSLog(@"the date selectes is %@", [df stringFromDate:[_datePicker date]]);
+    
     [self.delegate sessionClientViewControllerDidSave:self];
 }
 
@@ -45,5 +51,4 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
 @end
