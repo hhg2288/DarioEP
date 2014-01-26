@@ -6,6 +6,20 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		4AB0D8EF189562DF003FE9EC /* mogenerator */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 4AB0D8F0189562DF003FE9EC /* Build configuration list for PBXAggregateTarget "mogenerator" */;
+			buildPhases = (
+				4AB0D8F3189562E8003FE9EC /* Generate model */,
+			);
+			dependencies = (
+			);
+			name = mogenerator;
+			productName = mogenerator;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		243053E817A0936E00848E3A /* HHSignerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 243053E717A0936E00848E3A /* HHSignerViewController.m */; };
 		24974ABE178605DB000AD52F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24974ABD178605DB000AD52F /* UIKit.framework */; };
@@ -27,6 +41,11 @@
 		24E07B9717A3E8600027D01F /* HHSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 24E07B9617A3E8600027D01F /* HHSession.m */; };
 		24ECE4E11799EBBF00CFB726 /* HHClientCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 24ECE4E01799EBBF00CFB726 /* HHClientCell.m */; };
 		24F9D3DB179EBA7800941CA5 /* HHSessionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24F9D3DA179EBA7800941CA5 /* HHSessionViewController.m */; };
+		4AB0D8EE1895627C003FE9EC /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D8EC1895627C003FE9EC /* Model.xcdatamodeld */; };
+		4AB0D9021895649D003FE9EC /* Session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D8FA1895649D003FE9EC /* Session.m */; };
+		4AB0D9031895649D003FE9EC /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D8FC1895649D003FE9EC /* User.m */; };
+		4AB0D9041895649D003FE9EC /* _Session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D8FF1895649D003FE9EC /* _Session.m */; };
+		4AB0D9051895649D003FE9EC /* _User.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D9011895649D003FE9EC /* _User.m */; };
 		4F45F39ABB7546B58BED1A14 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8198C798C4D84373968F03CC /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -64,6 +83,15 @@
 		24ECE4E01799EBBF00CFB726 /* HHClientCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHClientCell.m; sourceTree = "<group>"; };
 		24F9D3D9179EBA7800941CA5 /* HHSessionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHSessionViewController.h; sourceTree = "<group>"; };
 		24F9D3DA179EBA7800941CA5 /* HHSessionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHSessionViewController.m; sourceTree = "<group>"; };
+		4AB0D8ED1895627C003FE9EC /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		4AB0D8F91895649D003FE9EC /* Session.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Session.h; sourceTree = "<group>"; };
+		4AB0D8FA1895649D003FE9EC /* Session.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Session.m; sourceTree = "<group>"; };
+		4AB0D8FB1895649D003FE9EC /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
+		4AB0D8FC1895649D003FE9EC /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
+		4AB0D8FE1895649D003FE9EC /* _Session.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _Session.h; sourceTree = "<group>"; };
+		4AB0D8FF1895649D003FE9EC /* _Session.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _Session.m; sourceTree = "<group>"; };
+		4AB0D9001895649D003FE9EC /* _User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _User.h; sourceTree = "<group>"; };
+		4AB0D9011895649D003FE9EC /* _User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _User.m; sourceTree = "<group>"; };
 		608FDA0CFD7946A690ADAB3F /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		8198C798C4D84373968F03CC /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -143,6 +171,8 @@
 		24ECE4DC1799E30700CFB726 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4AB0D8F71895649D003FE9EC /* Objects */,
+				4AB0D8EB18956258003FE9EC /* CoreData */,
 				24E07B8D17A3E2A60027D01F /* HHClient.h */,
 				24E07B8E17A3E2A60027D01F /* HHClient.m */,
 				24E07B9217A3E6F60027D01F /* HHDataSetup.h */,
@@ -180,6 +210,45 @@
 			);
 			name = Controllers;
 			path = "03 Controllers";
+			sourceTree = "<group>";
+		};
+		4AB0D8EB18956258003FE9EC /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				4AB0D8EC1895627C003FE9EC /* Model.xcdatamodeld */,
+			);
+			path = CoreData;
+			sourceTree = "<group>";
+		};
+		4AB0D8F71895649D003FE9EC /* Objects */ = {
+			isa = PBXGroup;
+			children = (
+				4AB0D8F81895649D003FE9EC /* Human */,
+				4AB0D8FD1895649D003FE9EC /* Machine */,
+			);
+			path = Objects;
+			sourceTree = "<group>";
+		};
+		4AB0D8F81895649D003FE9EC /* Human */ = {
+			isa = PBXGroup;
+			children = (
+				4AB0D8F91895649D003FE9EC /* Session.h */,
+				4AB0D8FA1895649D003FE9EC /* Session.m */,
+				4AB0D8FB1895649D003FE9EC /* User.h */,
+				4AB0D8FC1895649D003FE9EC /* User.m */,
+			);
+			path = Human;
+			sourceTree = "<group>";
+		};
+		4AB0D8FD1895649D003FE9EC /* Machine */ = {
+			isa = PBXGroup;
+			children = (
+				4AB0D8FE1895649D003FE9EC /* _Session.h */,
+				4AB0D8FF1895649D003FE9EC /* _Session.m */,
+				4AB0D9001895649D003FE9EC /* _User.h */,
+				4AB0D9011895649D003FE9EC /* _User.m */,
+			);
+			path = Machine;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -227,6 +296,7 @@
 			projectRoot = "";
 			targets = (
 				24974AB9178605DB000AD52F /* DarioApp */,
+				4AB0D8EF189562DF003FE9EC /* mogenerator */,
 			);
 		};
 /* End PBXProject section */
@@ -262,6 +332,20 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
 		};
+		4AB0D8F3189562E8003FE9EC /* Generate model */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate model";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd DarioApp\n/usr/local/bin/mogenerator --template-var arc=true --base-class RCMManagedObject -m 01\\ Model/CoreData/Model.xcdatamodeld/Model.xcdatamodel/ -M 01\\ Model/Objects/Machine/ -H 01\\ Model/Objects/Human";
+		};
 		8972C18DD73B42B0B540CA99 /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -283,17 +367,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4AB0D9051895649D003FE9EC /* _User.m in Sources */,
 				24974ACA178605DB000AD52F /* main.m in Sources */,
 				24974ACE178605DB000AD52F /* HHAppDelegate.m in Sources */,
 				24974ADA178605DC000AD52F /* HHMasterViewController.m in Sources */,
+				4AB0D9021895649D003FE9EC /* Session.m in Sources */,
+				4AB0D9041895649D003FE9EC /* _Session.m in Sources */,
 				24974ADD178605DC000AD52F /* HHDetailViewController.m in Sources */,
 				24ECE4E11799EBBF00CFB726 /* HHClientCell.m in Sources */,
 				24C2BDF1179AF10100EB5B03 /* HHEditClientViewController.m in Sources */,
 				24F9D3DB179EBA7800941CA5 /* HHSessionViewController.m in Sources */,
+				4AB0D9031895649D003FE9EC /* User.m in Sources */,
 				243053E817A0936E00848E3A /* HHSignerViewController.m in Sources */,
 				24E07B8F17A3E2A60027D01F /* HHClient.m in Sources */,
 				24E07B9417A3E6F60027D01F /* HHDataSetup.m in Sources */,
 				24E07B9717A3E8600027D01F /* HHSession.m in Sources */,
+				4AB0D8EE1895627C003FE9EC /* Model.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -403,6 +492,20 @@
 			};
 			name = Release;
 		};
+		4AB0D8F1189562DF003FE9EC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		4AB0D8F2189562DF003FE9EC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -424,7 +527,28 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		4AB0D8F0189562DF003FE9EC /* Build configuration list for PBXAggregateTarget "mogenerator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4AB0D8F1189562DF003FE9EC /* Debug */,
+				4AB0D8F2189562DF003FE9EC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		4AB0D8EC1895627C003FE9EC /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				4AB0D8ED1895627C003FE9EC /* Model.xcdatamodel */,
+			);
+			currentVersion = 4AB0D8ED1895627C003FE9EC /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 24974AB2178605DB000AD52F /* Project object */;
 }
