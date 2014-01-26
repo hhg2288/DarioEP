@@ -15,8 +15,16 @@
 #import "BBError.h"
 #import "BBQuery.h"
 #import "BBCache.h"
-#import "JSONKit.h"
 #import "BBError.h"
+#import "BBOAuth1a.h"
+
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
+#import "SocketIOPacket.h"
+
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
+#import <Social/Social.h>
+#endif
+#endif
 
 #if !__has_feature(objc_arc)
 #error Backbeam must be built with ARC.
@@ -54,7 +62,10 @@
 
 @property (nonatomic, strong) NSMutableDictionary *roomDelegates;
 @property (nonatomic, strong) NSMutableArray *realTimeDelegates;
+
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
 @property (nonatomic, strong) SocketIO *socketio;
+#endif
 @property (nonatomic, assign) NSInteger delay;
 
 @end
@@ -141,6 +152,7 @@
     self.client = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:url]];
 }
 
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
 - (void)connect {
     for (id<BBRealTimeConnectionDelegate> delegate in self.realTimeDelegates) {
         [delegate realTimeConnecting];
@@ -158,7 +170,7 @@
 }
 
 - (void)disableRealTime {
-    if (self.socketio && !self.socketio.isConnected && !self.socketio.isConnecting) {
+    if (self.socketio) {
         self.socketio.delegate = nil;
         [self.socketio disconnect];
         self.socketio = nil;
@@ -167,10 +179,6 @@
 }
 
 - (void)connectAfterDelay {
-    if (self.socketio && (self.socketio.isConnecting || self.socketio.isConnected)) {
-        return;
-    }
-    
     static NSInteger maxDelay = 10;
     
     self.delay++;
@@ -181,6 +189,9 @@
     double delayInSeconds = self.delay;
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        if (!self.socketio || self.socketio.isConnecting || self.socketio.isConnected) {
+            return;
+        }
         [self connect];
     });
 }
@@ -200,6 +211,36 @@
         [self.socketio sendEvent:@"subscribe" withData:params];
     }
     return YES;
+}
+
+- (NSArray*)subscribedRealTimeEvents {
+    NSArray *keys = [self.roomDelegates allKeys];
+    NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:keys.count];
+    for (NSString *room in keys) {
+        NSArray *components = [room componentsSeparatedByString:@"/"];
+        [arr addObject:[components lastObject]];
+    }
+    return arr;
+}
+
+- (void)unsubscribeAllRealTimeEventDelegates {
+    [self.roomDelegates removeAllObjects];
+    if (self.socketio && self.socketio.isConnected) {
+        NSDictionary *params = [NSDictionary dictionary];
+        [self.socketio sendEvent:@"unsubsribe-all" withData:params];
+    }
+}
+
+- (void)unsubscribeAllRealTimeConnectionDelegates {
+    [self.realTimeDelegates removeAllObjects];
+}
+
+- (BOOL)isRealTimeEnabled {
+    return self.socketio != nil;
+}
+
+- (BOOL)isRealTimeConnected {
+    return self.socketio != nil && [self.socketio isConnected];
 }
 
 - (BOOL)unsubscribeFromRealTimeEvents:(NSString*)event delegate:(id<BBRealTimeEventDelegate>)delegate {
@@ -316,31 +357,90 @@
     [self.realTimeDelegates removeObject:delegate];
 }
 
+- (BBTwitterLoginViewController*)twitterLoginViewController {
+    BBOAuth1a *oauthClient = [[BBOAuth1a alloc] init];
+    oauthClient.consumerKey = self.twitterConsumerKey;
+    oauthClient.consumerSecret = self.twitterConsumerSecret;
+    BBTwitterLoginViewController* vc = [[BBTwitterLoginViewController alloc] initWith:self oauthClient:oauthClient];
+    return vc;
+}
+
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
+// based on https://dev.twitter.com/docs/ios/using-reverse-auth
+- (void)twitterReverseOAuthWithAccount:(ACAccount*)account success:(SuccessReverseOauthBlock)success failure:(FailureReverseOauthBlock)failure {
+    
+    if (!self.twitterConsumerKey || !self.twitterConsumerSecret) {
+        if (failure) {
+            [[NSOperationQueue currentQueue] addOperationWithBlock:^{
+                failure([BBError errorWithStatus:@"MissingTwitterKeys" result:nil]);
+            }];
+        }
+        return;
+    }
+    
+    BBOAuth1a *oauthClient = [[BBOAuth1a alloc] init];
+    oauthClient.consumerKey    = self.twitterConsumerKey;
+    oauthClient.consumerSecret = self.twitterConsumerSecret;
+
+    NSDictionary *params = [NSDictionary dictionaryWithObject:@"reverse_auth" forKey:@"x_auth_mode"];
+    NSURLRequest *request = [oauthClient signedRequestWithMethod:@"POST"
+                                                         baseURL:@"https://api.twitter.com/oauth/request_token"
+                                                          params:params body:nil callback:nil];
+    
+    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation* op, id res) {
+        
+        NSDictionary *step2Params = [[NSMutableDictionary alloc] init];
+        [step2Params setValue:self.twitterConsumerKey forKey:@"x_reverse_auth_target"];
+        [step2Params setValue:op.responseString forKey:@"x_reverse_auth_parameters"];
+        
+        NSURL *url = [NSURL URLWithString:@"https://api.twitter.com/oauth/access_token"];
+        SLRequest *stepTwoRequest = [SLRequest requestForServiceType:SLServiceTypeTwitter
+                                                       requestMethod:SLRequestMethodPOST
+                                                                 URL:url
+                                                          parameters:step2Params];
+        
+        [stepTwoRequest setAccount:account];
+        [stepTwoRequest performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
+            NSString *responseStr = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+            
+            if (error) {
+                if (failure) {
+                    failure(error);
+                }
+                return;
+            }
+            
+            NSDictionary* bodyParams = [BBUtils parseQueryString:responseStr];
+            
+//            NSString* oauthToken       = [bodyParams objectForKey:@"oauth_token"];
+//            NSString* oauthTokenSecret = [bodyParams objectForKey:@"oauth_token_secret"];
+//            NSString* screenName       = [bodyParams objectForKey:@"screen_name"];
+//            NSString* userId           = [bodyParams objectForKey:@"user_id"];
+            
+            if (success) {
+                success(bodyParams);
+            }
+         }];
+    } failure:^(AFHTTPRequestOperation* op, NSError* error) {
+        if (failure) {
+            failure(error);
+        }
+    }];
+    [operation start];
+    
+    
+}
+#endif
+#endif
+
 - (void)setTwitterConsumerKey:(NSString *)twitterConsumerKey consumerSecret:(NSString*)twitterConsumerSecret {
     self.twitterConsumerKey = twitterConsumerKey;
     self.twitterConsumerSecret = twitterConsumerSecret;
 }
 
-- (BBTwitterLoginViewController*)twitterLoginViewController {
-    BBTwitterLoginViewController* vc = [[BBTwitterLoginViewController alloc] initWith:self];
-    vc.twitterConsumerKey = self.twitterConsumerKey;
-    vc.twitterConsumerSecret = self.twitterConsumerSecret;
-    return vc;
-}
-
-- (NSString*)sign:(NSMutableDictionary*)params {
-    return [self sign:params withNonce:YES];
-}
-
-- (NSString*)sign:(NSMutableDictionary*)params withNonce:(BOOL)withNonce {
-    [params setObject:self.sharedKey forKey:@"key"];
-    if (withNonce) {
-        [params setObject:[BBUtils nonce] forKey:@"nonce"];
-        [params setObject:[NSString stringWithFormat:@"%lld", (long long)([[NSDate date] timeIntervalSince1970]*1000)] forKey:@"time"];
-    }
-    
+- (NSString*)signature:(NSDictionary*)params {
     NSMutableString* parameterString = [[NSMutableString alloc] init];
-    NSMutableString* cacheKeyString = [[NSMutableString alloc] init];
     NSArray* sortedKeys = [[params allKeys] sortedArrayUsingSelector:@selector(compare:)];
     for (NSString* key in sortedKeys) {
         id value = [params objectForKey:key];
@@ -348,23 +448,37 @@
             NSArray* arr = [(NSArray*)value sortedArrayUsingSelector:@selector(compare:)];
             for (id val in arr) {
                 [parameterString appendFormat:@"&%@=%@", key, val];
-                [cacheKeyString appendFormat:@"&%@=%@", key, val];
             }
         } else {
             [parameterString appendFormat:@"&%@=%@", key, value];
-            if (![key isEqualToString:@"time"] && ![key isEqualToString:@"nonce"]) {
-                [cacheKeyString appendFormat:@"&%@=%@", key, value];
-            }
         }
     }
     [parameterString deleteCharactersInRange:NSMakeRange(0, 1)];
     
     NSData* hmac = [BBUtils hmacSha1:[parameterString dataUsingEncoding:NSUTF8StringEncoding] withKey:[self.secretKey dataUsingEncoding:NSUTF8StringEncoding]];
-    NSString* signature = [hmac base64EncodedString];
-    [parameterString deleteCharactersInRange:NSMakeRange(0, 1)];
-    [params setObject:signature forKey:@"signature"];
+    return [hmac base64EncodedString];
+}
+
+- (NSString*)cacheString:(NSMutableDictionary*)cacheParams {
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:cacheParams];
+    [params setObject:self.project forKey:@"project"];
+    [params setObject:self.env     forKey:@"env"];
+    [params setObject:self.host    forKey:@"host"];
     
-    return cacheKeyString;
+    NSMutableString* cacheKeyString = [[NSMutableString alloc] init];
+    NSArray* sortedKeys = [[params allKeys] sortedArrayUsingSelector:@selector(compare:)];
+    for (NSString* key in sortedKeys) {
+        id value = [params objectForKey:key];
+        if ([value isKindOfClass:[NSArray class]]) {
+            NSArray* arr = [(NSArray*)value sortedArrayUsingSelector:@selector(compare:)];
+            for (id val in arr) {
+                [cacheKeyString appendFormat:@"&%@=%@", key, val];
+            }
+        } else {
+            [cacheKeyString appendFormat:@"&%@=%@", key, value];
+        }
+    }
+    return [BBUtils hexString:[BBUtils sha1:[cacheKeyString dataUsingEncoding:NSUTF8StringEncoding]]];
 }
 
 - (void)perform:(NSString*)httpMethod
@@ -381,24 +495,24 @@
         [params setObject:self.authCode forKey:@"auth"];
     }
     
-    NSString *cacheKeyString = [self sign:params];
-    [params removeObjectForKey:@"method"];
-    [params removeObjectForKey:@"path"];
+    [params setObject:self.sharedKey forKey:@"key"];
     
     NSString* cacheKey = nil;
     BOOL useCache    = fetchPolicy == BBFetchPolicyLocalOnly
                     || fetchPolicy == BBFetchPolicyLocalAndRemote
                     || fetchPolicy == BBFetchPolicyLocalOrRemote;
     if (useCache) {
-        cacheKey = [BBUtils hexString:[BBUtils sha1:[cacheKeyString dataUsingEncoding:NSUTF8StringEncoding]]];
+        cacheKey = [self cacheString:params];
         NSData* data = [self.queryCache read:cacheKey];
         BOOL read = NO;
         if (data) {
-            id result = [[[JSONDecoder alloc] init] objectWithData:data];
+            id result = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
             if (result) {
                 read = YES;
                 if (success) {
-                    success(result, YES);
+                    [[NSOperationQueue currentQueue] addOperationWithBlock:^{
+                        success(result, YES);
+                    }];
                 }
                 if (fetchPolicy == BBFetchPolicyLocalOrRemote) {
                     return;
@@ -412,6 +526,12 @@
             return;
         }
     }
+    
+    [params setObject:[BBUtils nonce] forKey:@"nonce"];
+    [params setObject:[NSString stringWithFormat:@"%lld", (long long)([[NSDate date] timeIntervalSince1970]*1000)] forKey:@"time"];
+    [params setObject:[self signature:params] forKey:@"signature"];
+    [params removeObjectForKey:@"method"];
+    [params removeObjectForKey:@"path"];
     
     NSMutableURLRequest* req = [self.client requestWithMethod:httpMethod path:path parameters:params];
     __block AFJSONRequestOperation* operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:req success:^(NSURLRequest* req, NSHTTPURLResponse* resp, id result) {
@@ -424,19 +544,35 @@
         }
         
     } failure:^(NSURLRequest* req, NSHTTPURLResponse* resp, NSError* err, id result) {
+        
+        [self checkInvalidAuthCode:result];
+        
         if (failure) {
             failure(result, err);
         }
     }];
+    
     [operation start];
 }
 
-- (void)requestController:(NSString*)path
-                   method:(NSString*)method
-                   params:(NSDictionary*)params
-              fetchPolicy:(BBFetchPolicy)fetchPolicy
-                  success:(SuccessControllerBlock)success
-                  failure:(FailureControllerBlock)failure {
+- (void)checkInvalidAuthCode:(id)result {
+    if ([result isKindOfClass:[NSDictionary class]]) {
+        NSDictionary *dict = (NSDictionary*)result;
+        NSString *status = [dict stringForKey:@"status"];
+        if ([@"InvalidAuthCode" isEqualToString:status]) {
+            [self logout];
+        }
+    }
+}
+
+- (void)requestDataFromController:(NSString*)path
+                           method:(NSString*)method
+                           params:(NSDictionary*)params
+                      fetchPolicy:(BBFetchPolicy)fetchPolicy
+                   uploadProgress:(ProgressDataBlock)uploadProgress
+                 downloadProgress:(ProgressDataBlock)downloadProgress
+                          success:(SuccessControllerBlock)success
+                          failure:(FailureControllerBlock)failure {
     
     NSString *urlString = nil;
     if (self._webVersion) {
@@ -448,27 +584,72 @@
     if (self._httpAuth) {
         [client setAuthorizationHeaderWithUsername:self.project password:self._httpAuth];
     }
-    NSMutableURLRequest* req = [client requestWithMethod:method path:path parameters:params];
+    
+    NSMutableDictionary *fileParams = [[NSMutableDictionary alloc] initWithCapacity:params.count];
+    NSMutableDictionary *otherParams = [[NSMutableDictionary alloc] initWithCapacity:params.count];
+    
+    for (NSString *key in [params allKeys]) {
+        id obj = [params objectForKey:key];
+        if ([obj isKindOfClass:[BBFileUpload class]]) {
+            [fileParams setObject:obj forKey:key];
+        } else {
+            [otherParams setObject:obj forKey:key];
+        }
+    }
+    
+    NSMutableURLRequest* req = nil;
+    if (fileParams.count > 0) {
+        req = [client multipartFormRequestWithMethod:method
+                                                path:path
+                                          parameters:otherParams
+                           constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+                               
+                               for (NSString *key in fileParams) {
+                                   
+                                   BBFileUpload *fileUpload = (BBFileUpload*)[fileParams objectForKey:key];
+                                   
+                                   [formData appendPartWithFileData:fileUpload.data
+                                                               name:key
+                                                           fileName:fileUpload.fileName
+                                                           mimeType:fileUpload.mimeType];
+                               }
+        }];
+    } else {
+        req = [client requestWithMethod:method path:path parameters:otherParams];
+    }
+    
+    
     if (self.authCode) {
         [req setValue:self.authCode forHTTPHeaderField:@"x-backbeam-auth"];
     }
     [req setValue:@"ios" forHTTPHeaderField:@"x-backbeam-sdk"];
+    
+    NSMutableDictionary *prms = [NSMutableDictionary dictionaryWithDictionary:params];
+    [prms setObject:method forKey:@"method"];
+    [prms setObject:path   forKey:@"path"];
+    if (self.authCode) {
+        [prms setObject:self.authCode forKey:@"auth"];
+    }
+    if (self._webVersion) {
+        [prms setObject:self._webVersion forKey:@"version"];
+    }
     
     NSString* cacheKey = nil;
     BOOL useCache = fetchPolicy == BBFetchPolicyLocalOnly
                  || fetchPolicy == BBFetchPolicyLocalAndRemote
                  || fetchPolicy == BBFetchPolicyLocalOrRemote;
     if (useCache) {
-        NSString *cacheKeyString = [self sign:[[NSMutableDictionary alloc] initWithDictionary:params]];
+        NSString *cacheKeyString = [self cacheString:prms];
         cacheKey = [BBUtils hexString:[BBUtils sha1:[cacheKeyString dataUsingEncoding:NSUTF8StringEncoding]]];
         NSData* data = [self.queryCache read:cacheKey];
         BOOL read = NO;
         if (data) {
-            id result = [[[JSONDecoder alloc] init] objectWithData:data];
-            if (result) {
+            if (data) {
                 read = YES;
                 if (success) {
-                    success(result, YES, nil);
+                    [[NSOperationQueue currentQueue] addOperationWithBlock:^{
+                        success(data, YES, nil);
+                    }];
                 }
                 if (fetchPolicy == BBFetchPolicyLocalOrRemote) {
                     return;
@@ -483,19 +664,31 @@
         }
     }
     
-    __block AFJSONRequestOperation* operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:req success:^(NSURLRequest* req, NSHTTPURLResponse* resp, id result) {
+    AFHTTPRequestOperation* operation = [[AFHTTPRequestOperation alloc] initWithRequest:req];
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *op, id responseObject) {
         if (success) {
-            success(result, NO, operation.response);
+            success(op.responseData, NO, op.response);
         }
-        
         if (useCache) {
-            [self.queryCache write:operation.responseData withKey:cacheKey];
+            [self.queryCache write:op.responseData withKey:cacheKey];
         }
-    } failure:^(NSURLRequest* req, NSHTTPURLResponse* resp, NSError* err, id result) {
+    } failure:^(AFHTTPRequestOperation *op, NSError *err) {
         if (failure) {
-            failure(result, err);
+            failure(op.responseData, err);
         }
     }];
+    
+    if (downloadProgress) {
+        [operation setDownloadProgressBlock:^(NSUInteger bytesWritten, long long totalBytesWritten, long long totalBytesExpectedToWrite) {
+            downloadProgress(bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
+        }];
+    }
+    
+    if (uploadProgress) {
+        [operation setUploadProgressBlock:^(NSUInteger bytesWritten, long long totalBytesWritten, long long totalBytesExpectedToWrite) {
+            uploadProgress(bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
+        }];
+    }
     
     [operation start];
 }
@@ -504,10 +697,13 @@
                            method:(NSString*)method
                            params:(NSDictionary*)params
                       fetchPolicy:(BBFetchPolicy)fetchPolicy
+                         progress:(ProgressDataBlock)progress
                           success:(SuccessOperationBlock)success
                           failure:(FailureOperationBlock)failure {
     
-    [self requestController:path method:method params:params fetchPolicy:fetchPolicy success:^(id result, BOOL fromCache, NSHTTPURLResponse *response) {
+    [self requestDataFromController:path method:method params:params fetchPolicy:fetchPolicy uploadProgress:progress downloadProgress:nil success:^(NSData *data, BOOL fromCache, NSHTTPURLResponse *response) {
+        
+        id result = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
         
         NSString* auth   = [[response allHeaderFields] stringForKey:@"x-backbeam-auth"];
         NSString* userid = [[response allHeaderFields] stringForKey:@"x-backbeam-user"];
@@ -523,7 +719,9 @@
         if (success) {
             success(result, fromCache);
         }
-    } failure:^(id result, NSError *error) {
+    } failure:^(NSData *data, NSError *error) {
+        id result = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+        
         if (failure) {
             failure(result, error);
         }
@@ -535,10 +733,14 @@
                               method:(NSString*)method
                               params:(NSDictionary*)params
                          fetchPolicy:(BBFetchPolicy)fetchPolicy
+                            progress:(ProgressDataBlock)progress
                              success:(SuccessNearQueryBlock)success
                              failure:(FailureQueryBlock)failure {
     
-    [self requestController:path method:method params:params fetchPolicy:fetchPolicy success:^(id result, BOOL fromCache, NSHTTPURLResponse *response) {
+    [self requestDataFromController:path method:method params:params fetchPolicy:fetchPolicy uploadProgress:progress downloadProgress:nil success:^(NSData *data, BOOL fromCache, NSHTTPURLResponse *response) {
+        
+        id result = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+        
         if (![result isKindOfClass:[NSDictionary class]]) {
             if (failure) {
                 failure([BBError errorWithStatus:@"InvalidResponse" result:result]);
@@ -588,7 +790,10 @@
         if (success) {
             success(arr, totalCount.integerValue, distances, fromCache);
         }
-    } failure:^(id result, NSError *error) {
+    } failure:^(NSData *data, NSError *error) {
+        
+        id result = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+        
         if (result) {
             if (![result isKindOfClass:[NSDictionary class]]) {
                 if (failure) {
@@ -610,20 +815,7 @@
     
 }
 
-- (void)upload:(NSString*)httpMethod
-          data:(NSData*)data
-      fileName:(NSString*)fileName
-      mimeType:(NSString*)mimeType
-          path:(NSString*)path
-        params:(NSDictionary*)params
-      progress:(ProgressDataBlock)progress
-       success:(SuccessBlock)success
-       failure:(FailureOperationBlock)failure {
-
-    if (!mimeType) {
-        mimeType = @"application/octet-stream";
-    }
-    
+- (NSString*)mimeTypeForFile:(NSString*)fileName {
     if (!self.knownMimeTypes) {
         self.knownMimeTypes = [NSDictionary dictionaryWithObjectsAndKeys:
                                @"image/jpeg", @".jpg",
@@ -643,13 +835,43 @@
     
     for (NSString* extension in self.knownMimeTypes.allKeys) {
         if ([fileName hasSuffix:extension]) {
-            mimeType = [self.knownMimeTypes stringForKey:extension];
-            break;
+            return [self.knownMimeTypes stringForKey:extension];
         }
     }
-    // NSLog(@"fileName %@ mimeType %@", fileName, mimeType);
     
-    NSMutableURLRequest* req = [self.client multipartFormRequestWithMethod:httpMethod path:path parameters:params constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+    return @"application/octet-stream";
+}
+
+- (void)upload:(NSString*)httpMethod
+          data:(NSData*)data
+      fileName:(NSString*)fileName
+      mimeType:(NSString*)mimeType
+          path:(NSString*)path
+        params:(NSDictionary*)params
+          sign:(BOOL)sign
+      progress:(ProgressDataBlock)progress
+       success:(SuccessBlock)success
+       failure:(FailureOperationBlock)failure {
+
+    if (!mimeType) {
+        mimeType = [self mimeTypeForFile:fileName];
+    }
+    
+    NSMutableDictionary *allParams = [[NSMutableDictionary alloc] initWithDictionary:params];
+    if (sign) {
+        [allParams setObject:path forKey:@"path"];
+        [allParams setObject:httpMethod forKey:@"method"];
+        [allParams setObject:self.sharedKey forKey:@"key"];
+        [allParams setObject:[BBUtils nonce] forKey:@"nonce"];
+        [allParams setObject:[NSString stringWithFormat:@"%lld", (long long)([[NSDate date] timeIntervalSince1970]*1000)] forKey:@"time"];
+        NSString *signature = [self signature:allParams];
+        
+        [allParams setObject:signature forKey:@"signature"];
+        [allParams removeObjectForKey:@"path"];
+        [allParams removeObjectForKey:@"method"];
+    }
+    
+    NSMutableURLRequest* req = [self.client multipartFormRequestWithMethod:httpMethod path:path parameters:allParams constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
         [formData appendPartWithFileData:data name:@"file" fileName:fileName mimeType:mimeType];
     }];
     
@@ -674,6 +896,7 @@
     [operation start];
 }
 
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
 - (UIImage*)image:(NSString*)identifier
           version:(NSNumber*)version
          withSize:(CGSize)size
@@ -691,12 +914,12 @@
     } else {
         path = [NSString stringWithFormat:@"/data/file/download/%@", identifier];
     }
-    NSMutableDictionary* params = [NSMutableDictionary dictionaryWithObjectsAndKeys:width, @"width", height, @"height", nil];
-    [params setObject:@"GET" forKey:@"method"];
-    [params setObject:path forKey:@"path"];
-    NSString *cacheKey = [self sign:params withNonce:NO];
-    [params removeObjectForKey:@"method"];
-    [params removeObjectForKey:@"path"];
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:width, @"width", height, @"height", nil];
+    NSMutableDictionary *cacheParams = [NSMutableDictionary dictionaryWithDictionary:params];
+    
+    [cacheParams setObject:@"GET" forKey:@"method"];
+    [cacheParams setObject:path   forKey:@"path"];
+    NSString *cacheKey = [self cacheString:cacheParams];
     NSMutableURLRequest* req = [self.client requestWithMethod:@"GET" path:path parameters:params];
     
     UIImage* img = [self.imageCache objectForKey:cacheKey];
@@ -716,6 +939,7 @@
     } failure:failure];
     return nil;
 }
+#endif
 
 - (void)downloadPath:(NSString*)path progress:(ProgressDataBlock)progress success:(SuccessDataBlock)success failure:(FailureBlock)failure {
     NSMutableURLRequest* req = [self.client requestWithMethod:@"GET" path:path parameters:nil];
@@ -749,8 +973,8 @@
 - (void)persistDeviceToken:(NSData*)data {
     NSString* base64 = [data base64EncodedString];
     NSString* path = [self.basePath stringByAppendingPathComponent:kDeviceTokenPathComponent];
-    // TODO: handle error
-    [base64 writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    [base64 writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil]; // TODO: handle error
+    self.deviceToken = base64;
 }
 
 - (void)subscribeToChannels:(NSArray*)channels success:(SuccessBlock)success failure:(FailureBlock)failure {
@@ -787,7 +1011,6 @@
     NSDictionary* body = [[NSDictionary alloc] initWithObjectsAndKeys:self.deviceToken, @"token", @"apn", @"gateway", nil];
     
     [self perform:@"GET" path:@"/push/subscribed-channels" params:body fetchPolicy:BBFetchPolicyRemoteOnly success:^(id result, BOOL fromCache) {
-        NSLog(@"result %@", result);
         [self processBasicResponse:result success:^(id result) {
             NSArray *channels = [result arrayForKey:@"channels"];
             if (success) {
@@ -937,7 +1160,11 @@
     } else {
         NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:authCode, @"auth", user, @"user", nil];
         NSData* data = [NSKeyedArchiver archivedDataWithRootObject:dict];
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
         [data writeToFile:[self userPath] options:NSDataWritingAtomic|NSDataWritingFileProtectionComplete error:nil];
+#else
+        [data writeToFile:[self userPath] options:NSDataWritingAtomic error:nil];
+#endif
     }
 }
 
@@ -1131,6 +1358,53 @@
     }];
 }
 
+- (void)twitterSignupWithOAuthToken:(NSString*)oauthToken
+                   oauthTokenSecret:(NSString*)oauthTokenSecret
+                            success:(SuccessSocialSignupBlock)success
+                            failure:(FailureSocialSignupBlock)failure {
+    
+    NSMutableDictionary* postParams = [NSMutableDictionary dictionaryWithObjectsAndKeys:oauthToken, @"oauth_token",
+                                       oauthTokenSecret, @"oauth_token_secret", nil];
+    
+    [self socialSignup:@"twitter" params:postParams success:^(BBObject* user, BOOL isNew) {
+        if (success) {
+            success(user, isNew);
+        }
+    } failure:^(NSError* err) {
+        if (failure) {
+            failure(err);
+        }
+    }];
+    
+}
+
+- (void)twitterSignupWithOAuthToken:(NSString*)oauthToken
+                   oauthTokenSecret:(NSString*)oauthTokenSecret
+                               join:(NSString*)join
+                             params:(NSArray*)params
+                            success:(SuccessSocialSignupBlock)success
+                            failure:(FailureSocialSignupBlock)failure {
+    
+    NSMutableDictionary* postParams = [NSMutableDictionary dictionaryWithObjectsAndKeys:oauthToken, @"oauth_token",
+                                       oauthTokenSecret, @"oauth_token_secret", nil];
+    if (join) {
+        [postParams setObject:join forKey:@"joins"];
+        if (params) {
+            [postParams setObject:params forKey:@"params"];
+        }
+    }
+    [self socialSignup:@"twitter" params:postParams success:^(BBObject* user, BOOL isNew) {
+        if (success) {
+            success(user, isNew);
+        }
+    } failure:^(NSError* err) {
+        if (failure) {
+            failure(err);
+        }
+    }];
+    
+}
+
 - (void)facebookSignupWithAccessToken:(NSString*)accessToken
                               success:(SuccessFacebookBlock)success
                               failure:(FailureFacebookBlock)failure {
@@ -1162,6 +1436,48 @@
         }
     }
     [self socialSignup:@"facebook" params:postParams success:^(BBObject* user, BOOL isNew) {
+        if (success) {
+            success(user, isNew);
+        }
+    } failure:^(NSError* err) {
+        if (failure) {
+            failure(err);
+        }
+    }];
+    
+}
+
+- (void)googlePlusSignupWithAccessToken:(NSString*)accessToken
+                                success:(SuccessFacebookBlock)success
+                                failure:(FailureFacebookBlock)failure {
+    
+    NSDictionary* postParams = [NSDictionary dictionaryWithObject:accessToken forKey:@"access_token"];
+    [self socialSignup:@"googleplus" params:postParams success:^(BBObject* user, BOOL isNew) {
+        if (success) {
+            success(user, isNew);
+        }
+    } failure:^(NSError* err) {
+        if (failure) {
+            failure(err);
+        }
+    }];
+    
+}
+
+- (void)googlePlusSignupWithAccessToken:(NSString*)accessToken
+                                   join:(NSString*)join
+                                 params:(NSArray*)params
+                                success:(SuccessFacebookBlock)success
+                                failure:(FailureFacebookBlock)failure {
+    
+    NSMutableDictionary* postParams = [NSMutableDictionary dictionaryWithObject:accessToken forKey:@"access_token"];
+    if (join) {
+        [postParams setObject:join forKey:@"joins"];
+        if (params) {
+            [postParams setObject:params forKey:@"params"];
+        }
+    }
+    [self socialSignup:@"googleplus" params:postParams success:^(BBObject* user, BOOL isNew) {
         if (success) {
             success(user, isNew);
         }
@@ -1234,9 +1550,17 @@
     [[BackbeamSession instance] setTwitterConsumerKey:twitterConsumerKey consumerSecret:twitterConsumerSecret];
 }
 
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
 + (BBTwitterLoginViewController*)twitterLoginViewController {
     return [[BackbeamSession instance] twitterLoginViewController];
 }
+
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
++ (void)twitterReverseOAuthWithAccount:(ACAccount*)account success:(SuccessReverseOauthBlock)success failure:(FailureReverseOauthBlock)failure {
+    [[BackbeamSession instance] twitterReverseOAuthWithAccount:account success:success failure:failure];
+}
+#endif
+#endif
 
 + (void)persistDeviceToken:(NSData*)data {
     [[BackbeamSession instance] persistDeviceToken:data];
@@ -1296,6 +1620,22 @@
     [[BackbeamSession instance] loginWithEmail:email password:password join:nil params:nil success:success failure:failure];
 }
 
++ (void)twitterSignupWithOAuthToken:(NSString*)oauthToken
+                   oauthTokenSecret:(NSString*)oauthTokenSecret
+                            success:(SuccessSocialSignupBlock)success
+                            failure:(FailureSocialSignupBlock)failure {
+    [[BackbeamSession instance] twitterSignupWithOAuthToken:oauthToken oauthTokenSecret:oauthTokenSecret success:success failure:failure];
+}
+
++ (void)twitterSignupWithOAuthToken:(NSString*)oauthToken
+                   oauthTokenSecret:(NSString*)oauthTokenSecret
+                               join:(NSString*)join
+                             params:(NSArray*)params
+                            success:(SuccessSocialSignupBlock)success
+                            failure:(FailureSocialSignupBlock)failure {
+    [[BackbeamSession instance] twitterSignupWithOAuthToken:oauthToken oauthTokenSecret:oauthTokenSecret join:join params:params success:success failure:failure];
+}
+
 + (void)facebookSignupWithAccessToken:(NSString*)accessToken
                               success:(SuccessFacebookBlock)success
                               failure:(FailureFacebookBlock)failure {
@@ -1309,6 +1649,21 @@
                               success:(SuccessFacebookBlock)success
                               failure:(FailureFacebookBlock)failure {
     [[BackbeamSession instance] facebookSignupWithAccessToken:accessToken join:join params:params success:success failure:failure];
+}
+
++ (void)googlePlusSignupWithAccessToken:(NSString*)accessToken
+                                success:(SuccessFacebookBlock)success
+                                failure:(FailureFacebookBlock)failure {
+    [[BackbeamSession instance] googlePlusSignupWithAccessToken:accessToken success:success failure:failure];
+}
+
+
++ (void)googlePlusSignupWithAccessToken:(NSString*)accessToken
+                                   join:(NSString*)join
+                                 params:(NSArray*)params
+                                success:(SuccessFacebookBlock)success
+                                failure:(FailureFacebookBlock)failure {
+    [[BackbeamSession instance] googlePlusSignupWithAccessToken:accessToken join:join params:params success:success failure:failure];
 }
 
 + (BBQuery*)queryForEntity:(NSString*)entity {
@@ -1357,7 +1712,7 @@
                       fetchPolicy:(BBFetchPolicy)fetchPolicy
                           success:(SuccessOperationBlock)success
                           failure:(FailureOperationBlock)failure {
-    [[BackbeamSession instance] requestJSONFromController:path method:method params:params fetchPolicy:fetchPolicy success:success failure:failure];
+    [[BackbeamSession instance] requestJSONFromController:path method:method params:params fetchPolicy:fetchPolicy progress:nil success:success failure:failure];
 }
 
 + (void)requestObjectsFromController:(NSString*)path
@@ -1366,9 +1721,67 @@
                          fetchPolicy:(BBFetchPolicy)fetchPolicy
                              success:(SuccessNearQueryBlock)success
                              failure:(FailureQueryBlock)failure {
-    [[BackbeamSession instance] requestObjectsFromController:path method:method params:params fetchPolicy:fetchPolicy success:success failure:failure];
+    [[BackbeamSession instance] requestObjectsFromController:path method:method params:params fetchPolicy:fetchPolicy progress:nil success:success failure:failure];
 }
 
++ (void)requestJSONFromController:(NSString*)path
+                           method:(NSString*)method
+                           params:(NSDictionary*)params
+                      fetchPolicy:(BBFetchPolicy)fetchPolicy
+                         progress:(ProgressDataBlock)progress
+                          success:(SuccessOperationBlock)success
+                          failure:(FailureOperationBlock)failure {
+    
+    [[BackbeamSession instance] requestJSONFromController:path
+                                                   method:method
+                                                   params:params
+                                              fetchPolicy:fetchPolicy
+                                                 progress:progress
+                                                  success:success
+                                                  failure:failure];
+}
+
++ (void)requestObjectsFromController:(NSString*)path
+                              method:(NSString*)method
+                              params:(NSDictionary*)params
+                         fetchPolicy:(BBFetchPolicy)fetchPolicy
+                            progress:(ProgressDataBlock)progress
+                             success:(SuccessNearQueryBlock)success
+                             failure:(FailureQueryBlock)failure {
+    
+    [[BackbeamSession instance] requestObjectsFromController:path
+                                                      method:method
+                                                      params:params
+                                                 fetchPolicy:fetchPolicy
+                                                    progress:progress
+                                                     success:success
+                                                     failure:failure];
+}
+
++ (void)requestDataFromController:(NSString*)path
+                           method:(NSString*)method
+                           params:(NSDictionary*)params
+                      fetchPolicy:(BBFetchPolicy)fetchPolicy
+                   uploadProgress:(ProgressDataBlock)uploadProgress
+                 downloadProgress:(ProgressDataBlock)downloadProgress
+                          success:(SuccessDataBlock)success
+                          failure:(FailureBlock)failure {
+    
+    [[BackbeamSession instance] requestDataFromController:path
+                                                   method:method
+                                                   params:params
+                                              fetchPolicy:fetchPolicy
+                                           uploadProgress:uploadProgress
+                                         downloadProgress:downloadProgress
+                                                  success:^(NSData *result, BOOL fromCache, NSHTTPURLResponse *response) {
+                                                      success(result);
+                                                  }
+                                                  failure:^(NSData *result, NSError *error) {
+                                                      failure(error);
+                                                  }];
+}
+
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
 + (void)enableRealTime {
     [[BackbeamSession instance] enableRealTime];
 }
@@ -1385,6 +1798,26 @@
     return [[BackbeamSession instance] unsubscribeFromRealTimeEvents:event delegate:delegate];
 }
 
++ (NSArray*)subscribedRealTimeEvents {
+    return [[BackbeamSession instance] subscribedRealTimeEvents];
+}
+
++ (void)unsubscribeAllRealTimeEventDelegates {
+    [[BackbeamSession instance] unsubscribeAllRealTimeEventDelegates];
+}
+
++ (void)unsubscribeAllRealTimeConnectionDelegates {
+    [[BackbeamSession instance] unsubscribeAllRealTimeConnectionDelegates];
+}
+
++ (BOOL)isRealTimeEnabled {
+    return [[BackbeamSession instance] isRealTimeEnabled];
+}
+
++ (BOOL)isRealTimeConnected {
+    return [[BackbeamSession instance] isRealTimeConnected];
+}
+
 + (void)subscribeToRealTimeConnectionEvents:(id<BBRealTimeConnectionDelegate>)delegate {
     [[BackbeamSession instance] subscribeToRealTimeConnectionEvents:delegate];
 }
@@ -1396,9 +1829,14 @@
 + (BOOL)sendRealTimeEvent:(NSString*)event message:(NSDictionary*)message {
     return [[BackbeamSession instance] sendRealTimeEvent:event message:message];
 }
+#endif
 
 + (void)setProtocol:(NSString *)protocol {
     [[BackbeamSession instance] setProtocol:protocol];
+}
+
++ (NSString*)mimeTypeForFile:(NSString*)fileName {
+    return [[BackbeamSession instance] mimeTypeForFile:fileName];
 }
 
 @end

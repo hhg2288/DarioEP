@@ -16,7 +16,16 @@
 #import "BBJoinResult.h"
 #import "BBPushNotification.h"
 #import "BBTwitterLoginViewController.h"
+#import "BBCollectionConstraint.h"
+#import "BBFileUpload.h"
+
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
 #import "SocketIO.h"
+
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
+#import <Accounts/Accounts.h>
+#endif
+#endif
 
 @class BBQuery;
 @class BBTwitterLoginViewController;
@@ -39,7 +48,14 @@
 
 @end
 
+#if !defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
+@protocol SocketIODelegate
+@end
+#endif
+
 @interface BackbeamSession : NSObject<SocketIODelegate>
+
+- (NSString*)mimeTypeForFile:(NSString*)fileName;
 
 - (void)download:(NSMutableURLRequest*)request
         progress:(ProgressDataBlock)progress
@@ -57,16 +73,19 @@
       mimeType:(NSString*)mimeType
           path:(NSString*)path
         params:(NSDictionary*)params
+          sign:(BOOL)sign
       progress:(ProgressDataBlock)progress
        success:(SuccessBlock)success
        failure:(FailureOperationBlock)failure;
 
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
 - (UIImage*)image:(NSString*)identifier
           version:(NSNumber*)version
          withSize:(CGSize)size
          progress:(ProgressDataBlock)progress
           success:(SuccessImageBlock)success
           failure:(FailureBlock)failure;
+#endif
 
 - (void)setCurrentUser:(BBObject*)user withAuthCode:(NSString*)code;
 
@@ -103,6 +122,18 @@
 
 + (BBTwitterLoginViewController*)twitterLoginViewController;
 
++ (void)twitterSignupWithOAuthToken:(NSString*)oauthToken
+                   oauthTokenSecret:(NSString*)oauthTokenSecret
+                            success:(SuccessSocialSignupBlock)success
+                            failure:(FailureSocialSignupBlock)failure;
+
++ (void)twitterSignupWithOAuthToken:(NSString*)oauthToken
+                   oauthTokenSecret:(NSString*)oauthTokenSecret
+                               join:(NSString*)join
+                             params:(NSArray*)params
+                            success:(SuccessSocialSignupBlock)success
+                            failure:(FailureSocialSignupBlock)failure;
+
 + (void)facebookSignupWithAccessToken:(NSString*)accessToken
                               success:(SuccessFacebookBlock)success
                               failure:(FailureFacebookBlock)failure;
@@ -112,6 +143,16 @@
                                params:(NSArray*)params
                               success:(SuccessFacebookBlock)success
                               failure:(FailureFacebookBlock)failure;
+
++ (void)googlePlusSignupWithAccessToken:(NSString*)accessToken
+                                success:(SuccessFacebookBlock)success
+                                failure:(FailureFacebookBlock)failure;
+
++ (void)googlePlusSignupWithAccessToken:(NSString*)accessToken
+                                   join:(NSString*)join
+                                 params:(NSArray*)params
+                                success:(SuccessFacebookBlock)success
+                                failure:(FailureFacebookBlock)failure;
 
 + (BBQuery*)queryForEntity:(NSString*)entity;
 
@@ -140,6 +181,16 @@
 
 + (void)subscribedChannels:(SuccessArrayBlock)success
                    failure:(FailureBlock)failure;
+
++ (NSArray*)subscribedRealTimeEvents;
+
++ (void)unsubscribeAllRealTimeEventDelegates;
+
++ (void)unsubscribeAllRealTimeConnectionDelegates;
+
++ (BOOL)isRealTimeEnabled;
+
++ (BOOL)isRealTimeConnected;
 
 + (void)unsubscribeFromAllChannels:(SuccessBlock)success
                            failure:(FailureBlock)failure;
@@ -220,5 +271,40 @@
                          fetchPolicy:(BBFetchPolicy)fetchPolicy
                              success:(SuccessNearQueryBlock)success
                              failure:(FailureQueryBlock)failure;
+
++ (void)requestJSONFromController:(NSString*)path
+                           method:(NSString*)method
+                           params:(NSDictionary*)params
+                      fetchPolicy:(BBFetchPolicy)fetchPolicy
+                         progress:(ProgressDataBlock)progress
+                          success:(SuccessOperationBlock)success
+                          failure:(FailureOperationBlock)failure;
+
++ (void)requestObjectsFromController:(NSString*)path
+                              method:(NSString*)method
+                              params:(NSDictionary*)params
+                         fetchPolicy:(BBFetchPolicy)fetchPolicy
+                            progress:(ProgressDataBlock)progress
+                             success:(SuccessNearQueryBlock)success
+                             failure:(FailureQueryBlock)failure;
+
++ (void)requestDataFromController:(NSString*)path
+                           method:(NSString*)method
+                           params:(NSDictionary*)params
+                      fetchPolicy:(BBFetchPolicy)fetchPolicy
+                   uploadProgress:(ProgressDataBlock)uploadProgress
+                 downloadProgress:(ProgressDataBlock)downloadProgress
+                          success:(SuccessDataBlock)success
+                          failure:(FailureBlock)failure;
+
++ (NSString*)mimeTypeForFile:(NSString*)fileName;
+
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED) && __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
+
++ (void)twitterReverseOAuthWithAccount:(ACAccount*)account
+                               success:(SuccessReverseOauthBlock)success
+                               failure:(FailureReverseOauthBlock)failure;
+
+#endif
 
 @end

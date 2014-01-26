@@ -23,6 +23,7 @@
 @interface HHSessionViewController : UIViewController
 
 @property (nonatomic, weak) id <HHSessionViewControllerDelegate> delegate;
+@property (weak, nonatomic) IBOutlet UIDatePicker *datePicker;
 
 - (IBAction)save:(id)sender;
 - (IBAction)cancel:(id)sender;

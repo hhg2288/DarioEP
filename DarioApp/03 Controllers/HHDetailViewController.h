@@ -13,7 +13,7 @@
 
 @interface HHDetailViewController : UIViewController <UISplitViewControllerDelegate, HHEditClientViewControllerDelegate, HHSessionViewControllerDelegate>
 
-@property (strong, nonatomic) HHClient *client;
+@property (weak, nonatomic) HHClient *client;
 
 @property (weak, nonatomic) IBOutlet UILabel *clientFirstName;
 @property (weak, nonatomic) IBOutlet UILabel *clientLastName;

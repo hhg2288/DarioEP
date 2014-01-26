@@ -11,6 +11,7 @@
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonHMAC.h>
 #import "BBObject.h"
+#import "BBCollectionConstraint.h"
 
 @implementation BBUtils
 
@@ -144,6 +145,13 @@
         value = [NSString stringWithFormat:@"%f,%f,%f|%@",
                         location.latitude, location.longitude,
                         location.altitude, location.address];
+    } else if ([obj isKindOfClass:[BBCollectionConstraint class]]) {
+        return [obj description];
+    } else if ([obj isKindOfClass:[NSDateComponents class]]) {
+        NSDateComponents *dc = (NSDateComponents*)obj;
+        char cString[11];
+        sprintf(cString, "%04d-%02d-%02d", dc.year, dc.month, dc.day);
+        return [[NSString alloc] initWithUTF8String:cString];
     }
     return value;
 }

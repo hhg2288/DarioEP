@@ -166,6 +166,24 @@
                     location.altitude  = [dict numberForKey:@"alt"].doubleValue;
                     location.address   = [dict stringForKey:@"addr"];
                     value = location;
+                } else if ([type isEqualToString:@"j"]) {
+                    // pass
+                } else if ([type isEqualToString:@"c"] && [value isKindOfClass:[NSString class]]) {
+                    NSString *str = (NSString*)value;
+                    NSArray *components = [str componentsSeparatedByString:@"-"];
+                    if (components.count == 3) {
+                        NSString *year  = [components objectAtIndex:0];
+                        NSString *month = [components objectAtIndex:1];
+                        NSString *day   = [components objectAtIndex:2];
+                        
+                        NSDateComponents *d = [[NSDateComponents alloc] init];
+                        [d setYear :  year.integerValue];
+                        [d setMonth: month.integerValue];
+                        [d setDay  :   day.integerValue];
+                        value = d;
+                    }
+                } else if ([type isEqualToString:@"b"] && [value isKindOfClass:[NSNumber class]]) {
+                    // pass
                 }
                 if (value) { // sanity check
                     [self._fields setObject:value forKey:_key];
@@ -200,6 +218,10 @@
     return [self loginData:key forProvider:@"tw"];
 }
 
+- (NSString*)googlePlusData:(NSString*)key {
+    return [self loginData:key forProvider:@"gp"];
+}
+
 - (NSString*)identifier {
     return self._identifier;
 }
@@ -226,6 +248,22 @@
 
 - (NSNumber*)numberForField:(NSString*)key {
     return [self._fields numberForKey:key];
+}
+
+- (NSNumber*)booleanForField:(NSString*)key {
+    return [self._fields numberForKey:key];
+}
+
+- (NSDateComponents*)dayForField:(NSString*)key {
+    id obj = [self._fields objectForKey:key];
+    if ([obj isKindOfClass:[NSDateComponents class]]) {
+        return obj;
+    }
+    return nil;
+}
+
+- (id)JSONForField:(NSString*)key {
+    return [self._fields objectForKey:key];
 }
 
 - (id)rawValueForField:(NSString*)key {
@@ -274,6 +312,30 @@
 
 - (BOOL)setDate:(NSDate*)obj forField:(NSString*)key {
     return [self setRawValue:obj forField:key];
+}
+
+- (BOOL)setBoolean:(NSNumber*)obj forField:(NSString*)key {
+    return [self setRawValue:[NSNumber numberWithBool:obj.boolValue] forField:key]; // always 1 or 0
+}
+
+- (BOOL)setDay:(NSDateComponents*)obj forField:(NSString*)key {
+    return [self setRawValue:obj forField:key];
+}
+
+- (BOOL)setDayFromDate:(NSDate*)date forField:(NSString*)key {
+    NSDateComponents *obj = [[NSCalendar currentCalendar] components:NSYearCalendarUnit|NSMonthCalendarUnit|NSDayCalendarUnit fromDate:date];
+    return [self setRawValue:obj forField:key];
+}
+
+- (BOOL)setJSON:(id)obj forField:(NSString*)key {
+    NSError *error;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:obj options:kNilOptions error:&error];
+    if (error || !data) return NO;
+    
+    NSString* command = [NSString stringWithFormat:@"set-%@", key];
+    [self._fields setObject:obj forKey:key];
+    [self._commands setObject:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] forKey:command];
+    return YES;
 }
 
 - (BOOL)setRawValue:(id)obj forField:(NSString*)key {
@@ -487,6 +549,7 @@
     return [NSString stringWithFormat:@"entity=%@ identifier=%@ fields=%@", self.entity, self.identifier, self._fields];
 }
 
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
 - (UIImage*)imageWithSize:(CGSize)size
                   success:(SuccessImageBlock)success {
     
@@ -523,6 +586,8 @@
     }];
 }
 
+#endif
+
 // upload data
 
 - (BOOL)uploadDataWithProgress:(NSData*)data
@@ -548,8 +613,33 @@
                  mimeType:mimeType
                      path:path
                    params:self._commands
+                     sign:YES
                  progress:progress success:^(id result) {
+                     if (![result isKindOfClass:[NSDictionary class]]) {
+                         if (failure) {
+                             failure(self, [BBError errorWithStatus:@"InvalidResponse" result:result]);
+                         }
+                         return;
+                     }
                      NSDictionary* objects = [result dictionaryForKey:@"objects"];
+                     NSString *identifier = [result stringForKey:@"id"];
+                     if (!objects || !identifier) {
+                         if (failure) {
+                             failure(self, [BBError errorWithStatus:@"InvalidResponse" result:result]);
+                         }
+                         return;
+                     }
+                     
+                     NSString *status = [result stringForKey:@"status"];
+                     if (![status isEqualToString:@"Success"]) {
+                         if (failure) {
+                             failure(self, [BBError errorWithStatus:status result:result]);
+                         }
+                         return;
+                     }
+                     
+                     self._identifier = identifier;
+                     
                      NSMutableDictionary* selfDict = [NSMutableDictionary dictionaryWithObject:self forKey:self._identifier];
                      [BBObject objectsWithSession:self._session values:objects references:selfDict];
                      

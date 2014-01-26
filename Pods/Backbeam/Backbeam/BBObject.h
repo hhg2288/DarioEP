@@ -48,6 +48,8 @@
 
 - (NSString*)twitterData:(NSString*)key;
 
+- (NSString*)googlePlusData:(NSString*)key;
+
 - (NSArray*)fieldNames;
 
 // methods for reading fields
@@ -57,6 +59,12 @@
 - (NSDate*)dateForField:(NSString*)key;
 
 - (NSNumber*)numberForField:(NSString*)key;
+
+- (NSNumber*)booleanForField:(NSString*)key;
+
+- (NSDateComponents*)dayForField:(NSString*)key;
+
+- (id)JSONForField:(NSString*)key;
 
 - (BBObject*)objectForField:(NSString*)key;
 
@@ -77,6 +85,14 @@
 - (BOOL)setObject:(BBObject*)obj forField:(NSString*)key;
 
 - (BOOL)setDate:(NSDate*)obj forField:(NSString*)key;
+
+- (BOOL)setBoolean:(NSNumber*)obj forField:(NSString*)key;
+
+- (BOOL)setDay:(NSDateComponents*)obj forField:(NSString*)key;
+
+- (BOOL)setDayFromDate:(NSDate*)date forField:(NSString*)key;
+
+- (BOOL)setJSON:(id)obj forField:(NSString*)key;
 
 - (BOOL)setRawValue:(id)obj forField:(NSString*)key;
 
@@ -109,6 +125,7 @@
 
 // methods for files
 
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
 - (UIImage*)imageWithSize:(CGSize)size
                   success:(SuccessImageBlock)success;
 
@@ -120,6 +137,7 @@
                  progress:(ProgressDataBlock)progress
                   success:(SuccessImageBlock)success
                   failure:(FailureObjectBlock)failure;
+#endif
 
 // upload data
 

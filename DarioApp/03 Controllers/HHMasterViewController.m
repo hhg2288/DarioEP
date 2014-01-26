@@ -145,7 +145,7 @@
     //NSDate *object = theClients[indexPath.row];
     //self.detailViewController.detailItem = object;
     
-    BBObject *clientSelected = theClients[indexPath.row];
+    HHClient *clientSelected = theClients[indexPath.row];
     self.detailViewController.client = clientSelected;
 }
 

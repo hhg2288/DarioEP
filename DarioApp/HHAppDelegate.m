@@ -14,16 +14,25 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-    UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
-    UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
-    splitViewController.delegate = (id)navigationController.topViewController;
+//    UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
+//    UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
+//    splitViewController.delegate = (id)navigationController.topViewController;
     
     [Backbeam setProject:@"app-sesiones"
                sharedKey:@"a8122f6b92cce3a3debabb37f679aa5dec0a022d"
                secretKey:@"43a68114e5acb554941fada37ec459b628220d8968d5c9fced125c8c11b46d853ca3921be1d6af32"
              environment:@"dev"];
     
+    [self setupMagicalRecord];
+    
     return YES;
+}
+
+- (void)setupMagicalRecord
+{
+    // CoreData stack
+    //    [MagicalRecord setupCoreDataStackWithStoreNamed:@"Model.sqlite"];
+    [MagicalRecord setupCoreDataStackWithAutoMigratingSqliteStoreNamed:@"Model.sqlite"];
 }
 							
 - (void)applicationWillResignActive:(UIApplication *)application

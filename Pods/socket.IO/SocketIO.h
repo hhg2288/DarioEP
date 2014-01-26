@@ -1,6 +1,6 @@
 //
 //  SocketIO.h
-//  v0.2.5 ARC
+//  v0.4.1 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -23,7 +23,8 @@
 
 #import <Foundation/Foundation.h>
 
-@class SRWebSocket;
+#import "SocketIOTransport.h"
+
 @class SocketIO;
 @class SocketIOPacket;
 
@@ -35,24 +36,30 @@ typedef enum {
     SocketIOServerRespondedWithInvalidConnectionData = -1,
     SocketIOServerRespondedWithDisconnect = -2,
     SocketIOHeartbeatTimeout = -3,
-    SocketIOWebSocketClosed = -4
+    SocketIOWebSocketClosed = -4,
+    SocketIOTransportsNotSupported = -5,
+    SocketIOHandshakeFailed = -6,
+    SocketIODataCouldNotBeSend = -7
 } SocketIOErrorCodes;
+
 
 @protocol SocketIODelegate <NSObject>
 @optional
 - (void) socketIODidConnect:(SocketIO *)socket;
-- (void) socketIODidDisconnect:(SocketIO *)socket __attribute__((deprecated));
 - (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error;
 - (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didSendMessage:(SocketIOPacket *)packet;
-- (void) socketIOHandshakeFailed:(SocketIO *)socket;
-- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error;
+- (void) socketIO:(SocketIO *)socket onError:(NSError *)error;
+
+// TODO: deprecated -> to be removed
+- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error __attribute__((deprecated));
+- (void) socketIOHandshakeFailed:(SocketIO *)socket __attribute__((deprecated));
 @end
 
 
-@interface SocketIO : NSObject <NSURLConnectionDelegate>
+@interface SocketIO : NSObject <NSURLConnectionDelegate, SocketIOTransportDelegate>
 {
     NSString *_host;
     NSInteger _port;
@@ -60,17 +67,19 @@ typedef enum {
     NSString *_endpoint;
     NSDictionary *_params;
     
-    __unsafe_unretained id<SocketIODelegate> _delegate;
+    __weak id<SocketIODelegate> _delegate;
     
-    SRWebSocket *_webSocket;
+    NSObject <SocketIOTransport> *_transport;
     
     BOOL _isConnected;
     BOOL _isConnecting;
     BOOL _useSecure;
     
+    NSURLConnection *_handshake;
+    
     // heartbeat
     NSTimeInterval _heartbeatTimeout;
-    NSTimer *_timeout;
+    dispatch_source_t _timeout;
     
     NSMutableArray *_queue;
     
@@ -79,18 +88,29 @@ typedef enum {
     NSInteger _ackCount;
     
     // http request
-    NSMutableData * _httpRequestData;
+    NSMutableData *_httpRequestData;
+    
+    // get all arguments from ack? (https://github.com/pkyeck/socket.IO-objc/pull/85)
+    BOOL _returnAllDataFromAck;
 }
 
-@property (nonatomic, readonly) BOOL isConnected, isConnecting;
+@property (nonatomic, readonly) NSString *host;
+@property (nonatomic, readonly) NSInteger port;
+@property (nonatomic, readonly) NSString *sid;
+@property (nonatomic, readonly) NSTimeInterval heartbeatTimeout;
 @property (nonatomic) BOOL useSecure;
-@property (nonatomic, unsafe_unretained) id<SocketIODelegate> delegate;
+@property (nonatomic, readonly) BOOL isConnected, isConnecting;
+@property (nonatomic, weak) id<SocketIODelegate> delegate;
+@property (nonatomic) BOOL returnAllDataFromAck;
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withNamespace:(NSString *)endpoint;
+- (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withNamespace:(NSString *)endpoint withConnectionTimeout: (NSTimeInterval) connectionTimeout;
+
 - (void) disconnect;
+- (void) disconnectForced;
 
 - (void) sendMessage:(NSString *)data;
 - (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function;
@@ -100,33 +120,6 @@ typedef enum {
 - (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function;
 - (void) sendAcknowledgement:(NSString*)pId withArgs:(NSArray *)data;
 
-@end
-
-
-@interface SocketIOPacket : NSObject
-{
-    NSString *type;
-    NSString *pId;
-    NSString *ack;
-    NSString *name;
-    NSString *data;
-    NSArray *args;
-    NSString *endpoint;
-    NSArray *_types;
-}
-
-@property (nonatomic, copy) NSString *type;
-@property (nonatomic, copy) NSString *pId;
-@property (nonatomic, copy) NSString *ack;
-@property (nonatomic, copy) NSString *name;
-@property (nonatomic, copy) NSString *data;
-@property (nonatomic, copy) NSString *endpoint;
-@property (nonatomic, copy) NSArray *args;
-
-- (id) initWithType:(NSString *)packetType;
-- (id) initWithTypeIndex:(int)index;
-- (id) dataAsJSON;
-- (NSNumber *) typeAsNumber;
-- (NSString *) typeForIndex:(int)index;
+- (void) setResourceName:(NSString *)name;
 
 @end
