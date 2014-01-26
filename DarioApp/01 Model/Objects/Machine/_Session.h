@@ -6,6 +6,7 @@
 
 extern const struct SessionAttributes {
 	__unsafe_unretained NSString *created_at;
+	__unsafe_unretained NSString *note;
 } SessionAttributes;
 
 extern const struct SessionRelationships {
@@ -16,6 +17,7 @@ extern const struct SessionFetchedProperties {
 } SessionFetchedProperties;
 
 @class User;
+
 
 
 
@@ -42,6 +44,16 @@ extern const struct SessionFetchedProperties {
 
 
 
+@property (nonatomic, strong) NSString* note;
+
+
+
+//- (BOOL)validateNote:(id*)value_ error:(NSError**)error_;
+
+
+
+
+
 @property (nonatomic, strong) User *user;
 
 //- (BOOL)validateUser:(id*)value_ error:(NSError**)error_;
@@ -61,6 +73,12 @@ extern const struct SessionFetchedProperties {
 
 - (NSDate*)primitiveCreated_at;
 - (void)setPrimitiveCreated_at:(NSDate*)value;
+
+
+
+
+- (NSString*)primitiveNote;
+- (void)setPrimitiveNote:(NSString*)value;
 
 
 

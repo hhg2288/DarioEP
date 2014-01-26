@@ -5,6 +5,7 @@
 
 const struct SessionAttributes SessionAttributes = {
 	.created_at = @"created_at",
+	.note = @"note",
 };
 
 const struct SessionRelationships SessionRelationships = {
@@ -48,6 +49,13 @@ const struct SessionFetchedProperties SessionFetchedProperties = {
 
 
 @dynamic created_at;
+
+
+
+
+
+
+@dynamic note;
 
 
 

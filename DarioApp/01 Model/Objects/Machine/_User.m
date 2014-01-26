@@ -4,6 +4,7 @@
 #import "_User.h"
 
 const struct UserAttributes UserAttributes = {
+	.birthDate = @"birthDate",
 	.name = @"name",
 	.surname = @"surname",
 };
@@ -44,6 +45,13 @@ const struct UserFetchedProperties UserFetchedProperties = {
 
 	return keyPaths;
 }
+
+
+
+
+@dynamic birthDate;
+
+
 
 
 

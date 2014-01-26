@@ -223,9 +223,9 @@
 		4AB0D8EB18956258003FE9EC /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
+				4AB0D8EC1895627C003FE9EC /* Model.xcdatamodeld */,
 				4AB0D90A18956797003FE9EC /* RCMManagedObject.h */,
 				4AB0D90B18956797003FE9EC /* RCMManagedObject.m */,
-				4AB0D8EC1895627C003FE9EC /* Model.xcdatamodeld */,
 				4AB0D90D1895685E003FE9EC /* RCMAPIResponseCoreDataMappingProtocol.h */,
 			);
 			path = CoreData;
