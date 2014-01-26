@@ -4,7 +4,8 @@
 #import "_Session.h"
 
 const struct SessionAttributes SessionAttributes = {
-	.created_at = @"created_at",
+	.backbeamIdentifier = @"backbeamIdentifier",
+	.createdAt = @"createdAt",
 	.note = @"note",
 };
 
@@ -48,7 +49,14 @@ const struct SessionFetchedProperties SessionFetchedProperties = {
 
 
 
-@dynamic created_at;
+@dynamic backbeamIdentifier;
+
+
+
+
+
+
+@dynamic createdAt;
 
 
 

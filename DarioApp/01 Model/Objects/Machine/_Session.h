@@ -5,7 +5,8 @@
 #import "RCMManagedObject.h"
 
 extern const struct SessionAttributes {
-	__unsafe_unretained NSString *created_at;
+	__unsafe_unretained NSString *backbeamIdentifier;
+	__unsafe_unretained NSString *createdAt;
 	__unsafe_unretained NSString *note;
 } SessionAttributes;
 
@@ -17,6 +18,7 @@ extern const struct SessionFetchedProperties {
 } SessionFetchedProperties;
 
 @class User;
+
 
 
 
@@ -34,11 +36,21 @@ extern const struct SessionFetchedProperties {
 
 
 
-@property (nonatomic, strong) NSDate* created_at;
+@property (nonatomic, strong) NSString* backbeamIdentifier;
 
 
 
-//- (BOOL)validateCreated_at:(id*)value_ error:(NSError**)error_;
+//- (BOOL)validateBackbeamIdentifier:(id*)value_ error:(NSError**)error_;
+
+
+
+
+
+@property (nonatomic, strong) NSDate* createdAt;
+
+
+
+//- (BOOL)validateCreatedAt:(id*)value_ error:(NSError**)error_;
 
 
 
@@ -71,8 +83,14 @@ extern const struct SessionFetchedProperties {
 @interface _Session (CoreDataGeneratedPrimitiveAccessors)
 
 
-- (NSDate*)primitiveCreated_at;
-- (void)setPrimitiveCreated_at:(NSDate*)value;
+- (NSString*)primitiveBackbeamIdentifier;
+- (void)setPrimitiveBackbeamIdentifier:(NSString*)value;
+
+
+
+
+- (NSDate*)primitiveCreatedAt;
+- (void)setPrimitiveCreatedAt:(NSDate*)value;
 
 
 
