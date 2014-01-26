@@ -10,4 +10,9 @@ typedef void (^RCMRequestCompletionBlock)(NSArray *response, NSError *error);
 
 @interface RCMAPIClient : NSObject
 
++ (instancetype)sharedInstance;
+
+- (void)GETUsers:(RCMRequestCompletionBlock)completionBlock;
+- (void)GETSessions:(RCMRequestCompletionBlock)completionBlock;
+
 @end
