@@ -29,7 +29,7 @@
 {
     BBQuery* query = [Backbeam queryForEntity:@"client"];
     // optional: you can set a fetch policy
-    [query setFetchPolicy:BBFetchPolicyLocalAndRemote];
+    [query setFetchPolicy:BBFetchPolicyRemoteOnly];
     [query fetch:100 offset:0 success:^(NSArray* objects, NSInteger totalCount, BOOL fromCache) {
         
         NSMutableArray *usersArray = [NSMutableArray array];
@@ -49,7 +49,8 @@
 {
     BBQuery* query = [Backbeam queryForEntity:@"session"];
     // optional: you can set a fetch policy
-    [query setFetchPolicy:BBFetchPolicyLocalAndRemote];
+    [query setFetchPolicy:BBFetchPolicyRemoteOnly];
+    [query setQuery:@"join client"];
     [query fetch:100 offset:0 success:^(NSArray* objects, NSInteger totalCount, BOOL fromCache) {
         
         NSMutableArray *sessionsArray = [NSMutableArray array];
