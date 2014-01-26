@@ -46,6 +46,7 @@
 		4AB0D9031895649D003FE9EC /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D8FC1895649D003FE9EC /* User.m */; };
 		4AB0D9041895649D003FE9EC /* _Session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D8FF1895649D003FE9EC /* _Session.m */; };
 		4AB0D9051895649D003FE9EC /* _User.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D9011895649D003FE9EC /* _User.m */; };
+		4AB0D909189565E7003FE9EC /* RCMAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D908189565E7003FE9EC /* RCMAPIClient.m */; };
 		4F45F39ABB7546B58BED1A14 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8198C798C4D84373968F03CC /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -92,6 +93,8 @@
 		4AB0D8FF1895649D003FE9EC /* _Session.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _Session.m; sourceTree = "<group>"; };
 		4AB0D9001895649D003FE9EC /* _User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _User.h; sourceTree = "<group>"; };
 		4AB0D9011895649D003FE9EC /* _User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _User.m; sourceTree = "<group>"; };
+		4AB0D907189565E7003FE9EC /* RCMAPIClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCMAPIClient.h; sourceTree = "<group>"; };
+		4AB0D908189565E7003FE9EC /* RCMAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCMAPIClient.m; sourceTree = "<group>"; };
 		608FDA0CFD7946A690ADAB3F /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		8198C798C4D84373968F03CC /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -171,6 +174,7 @@
 		24ECE4DC1799E30700CFB726 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4AB0D906189565B5003FE9EC /* Networking */,
 				4AB0D8F71895649D003FE9EC /* Objects */,
 				4AB0D8EB18956258003FE9EC /* CoreData */,
 				24E07B8D17A3E2A60027D01F /* HHClient.h */,
@@ -249,6 +253,15 @@
 				4AB0D9011895649D003FE9EC /* _User.m */,
 			);
 			path = Machine;
+			sourceTree = "<group>";
+		};
+		4AB0D906189565B5003FE9EC /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				4AB0D907189565E7003FE9EC /* RCMAPIClient.h */,
+				4AB0D908189565E7003FE9EC /* RCMAPIClient.m */,
+			);
+			path = Networking;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -374,6 +387,7 @@
 				4AB0D9021895649D003FE9EC /* Session.m in Sources */,
 				4AB0D9041895649D003FE9EC /* _Session.m in Sources */,
 				24974ADD178605DC000AD52F /* HHDetailViewController.m in Sources */,
+				4AB0D909189565E7003FE9EC /* RCMAPIClient.m in Sources */,
 				24ECE4E11799EBBF00CFB726 /* HHClientCell.m in Sources */,
 				24C2BDF1179AF10100EB5B03 /* HHEditClientViewController.m in Sources */,
 				24F9D3DB179EBA7800941CA5 /* HHSessionViewController.m in Sources */,
