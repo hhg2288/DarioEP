@@ -47,6 +47,7 @@
 		4AB0D9041895649D003FE9EC /* _Session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D8FF1895649D003FE9EC /* _Session.m */; };
 		4AB0D9051895649D003FE9EC /* _User.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D9011895649D003FE9EC /* _User.m */; };
 		4AB0D909189565E7003FE9EC /* RCMAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D908189565E7003FE9EC /* RCMAPIClient.m */; };
+		4AB0D90C18956797003FE9EC /* RCMManagedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB0D90B18956797003FE9EC /* RCMManagedObject.m */; };
 		4F45F39ABB7546B58BED1A14 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8198C798C4D84373968F03CC /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -95,6 +96,8 @@
 		4AB0D9011895649D003FE9EC /* _User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _User.m; sourceTree = "<group>"; };
 		4AB0D907189565E7003FE9EC /* RCMAPIClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCMAPIClient.h; sourceTree = "<group>"; };
 		4AB0D908189565E7003FE9EC /* RCMAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCMAPIClient.m; sourceTree = "<group>"; };
+		4AB0D90A18956797003FE9EC /* RCMManagedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCMManagedObject.h; sourceTree = "<group>"; };
+		4AB0D90B18956797003FE9EC /* RCMManagedObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCMManagedObject.m; sourceTree = "<group>"; };
 		608FDA0CFD7946A690ADAB3F /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		8198C798C4D84373968F03CC /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -219,6 +222,8 @@
 		4AB0D8EB18956258003FE9EC /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
+				4AB0D90A18956797003FE9EC /* RCMManagedObject.h */,
+				4AB0D90B18956797003FE9EC /* RCMManagedObject.m */,
 				4AB0D8EC1895627C003FE9EC /* Model.xcdatamodeld */,
 			);
 			path = CoreData;
@@ -397,6 +402,7 @@
 				24E07B9417A3E6F60027D01F /* HHDataSetup.m in Sources */,
 				24E07B9717A3E8600027D01F /* HHSession.m in Sources */,
 				4AB0D8EE1895627C003FE9EC /* Model.xcdatamodeld in Sources */,
+				4AB0D90C18956797003FE9EC /* RCMManagedObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
