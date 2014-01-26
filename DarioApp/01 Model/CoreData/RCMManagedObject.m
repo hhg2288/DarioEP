@@ -17,4 +17,11 @@
     }
 }
 
++ (NSManagedObject *)objectForAPIResponse:(id)response
+{
+    NSAssert(YES, @"You should implement this method");
+    
+    return nil;
+}
+
 @end

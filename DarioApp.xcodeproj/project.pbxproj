@@ -98,6 +98,7 @@
 		4AB0D908189565E7003FE9EC /* RCMAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCMAPIClient.m; sourceTree = "<group>"; };
 		4AB0D90A18956797003FE9EC /* RCMManagedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCMManagedObject.h; sourceTree = "<group>"; };
 		4AB0D90B18956797003FE9EC /* RCMManagedObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCMManagedObject.m; sourceTree = "<group>"; };
+		4AB0D90D1895685E003FE9EC /* RCMAPIResponseCoreDataMappingProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCMAPIResponseCoreDataMappingProtocol.h; sourceTree = "<group>"; };
 		608FDA0CFD7946A690ADAB3F /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		8198C798C4D84373968F03CC /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -225,6 +226,7 @@
 				4AB0D90A18956797003FE9EC /* RCMManagedObject.h */,
 				4AB0D90B18956797003FE9EC /* RCMManagedObject.m */,
 				4AB0D8EC1895627C003FE9EC /* Model.xcdatamodeld */,
+				4AB0D90D1895685E003FE9EC /* RCMAPIResponseCoreDataMappingProtocol.h */,
 			);
 			path = CoreData;
 			sourceTree = "<group>";

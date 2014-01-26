@@ -7,8 +7,9 @@
 //
 
 #import <CoreData/CoreData.h>
+#import "RCMAPIResponseCoreDataMappingProtocol.h"
 
 
-@interface RCMManagedObject : NSManagedObject
+@interface RCMManagedObject : NSManagedObject <RCMAPIResponseCoreDataMappingProtocol>
 
 @end
